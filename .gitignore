@@ -1,0 +1,6 @@
+__pycache__
+ddnet_django/settings_private.py
+*/migrations
+db.sqlite3
+.tags*
+.DS_Store
