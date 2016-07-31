@@ -1,3 +1,7 @@
+'''Models are registered here to provide access for the admininterface.'''
+
 from django.contrib import admin
 
-# Register your models here.
+from .models import Skin
+
+admin.site.register(Skin)
