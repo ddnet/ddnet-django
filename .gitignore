@@ -4,3 +4,4 @@ ddnet_django/settings_private.py
 db.sqlite3
 .tags*
 .DS_Store
+media
