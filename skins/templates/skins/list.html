@@ -1,8 +1,26 @@
-<ul>
-    {% for i in items %}
-        <li>
-            {{ i }}
-            <img src="{{ i.skin_image.url }}" /></a>
-        </li>
-    {% endfor %}
-</ul>
+{# extend the base template #}
+{% extends "base.html" %}
+
+{# override the section_tilt block with custom header name #}
+{% block section_title %}Skins database{% endblock %}
+
+{# add some submenu on this page #}
+{% block sub_menu %}
+    <ul>
+        <li><a href="most_downloaded/"><span style="color: red">HOT</span></a></li>
+        <li><a href="newest/">Newest</a></li>
+        <li><a href="hot-artists/">Hot artists</a></li>
+    </ul>
+{% endblock %}
+
+{# put the main content #}
+{% block content %}
+    <ul>
+        {% for i in items %}
+            <li>
+                {{ i }}
+                <img src="{{ i.skin_image.url }}"/></a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

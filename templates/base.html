@@ -1,0 +1,78 @@
+{% comment %}
+This the base template file containing the follwing sections, which can be overidded by derived views:
+- scripts: for page-specific scripts
+- title: containg the page title
+- main_menu: main menu section
+- sub_menu: page-specific sub menu section
+- section_title: page-specific header title
+- content: main page content
+- footer: footer
+
+Every view should extend this base template using the following directive:
+{% extends "base.html" %}
+
+The specific sections can be overriden using the following scheme:
+{% block section_title %}Skins database{% endblock %}
+The above code will result in replacing section_title block in the base.html with the "Skin database" word.
+
+@author kchaber
+
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/style.css" %}"/>
+    {% block scripts %}
+
+    {% endblock %}
+    <title>{% block title %}DDraceNetwork{% endblock %}</title>
+</head>
+
+<body>
+<div class="title">
+    <h1>
+        <a href="/">
+            <img class="logobig" alt="DDraceNetwork" src="{% static "images/icons/ddnet2.svg" %}"/>
+            <img class="logosmall" alt="DDraceNetwork" src="{% static "images/icons/ddnet.svg" %}"/>
+        </a>
+    </h1>
+</div>
+<article>
+    <menu class="contentleft">
+        {% block main_menu %}
+            <ul class="big">
+                <li><a href="/status/">Status</a></li>
+                <li><a href="/ranks/">Ranks</a></li>
+                <li><a href="/releases/">Releases</a></li>
+                <li><a href="/tournaments/">Tournaments</a></li>
+                <li><a href="/skins/">Skin Database</a></li>
+                <li><a href="/downloads/">Downloads</a></li>
+                <li><a href="/stats/">Statistics</a></li>
+                <li><a href="//forum.ddnet.tw/">Forum</a></li>
+                <li><a href="http://wiki.ddnet.tw/">Wiki</a></li>
+            </ul>
+        {% endblock %}
+        {% block sub_menu %}
+
+        {% endblock %}
+    </menu>
+
+    <section>
+        <div class="block">
+            <h2>{% block section_title %}{% endblock %}</h2>
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer>
+            {# TODO: someone may adjust this and add some styling to make it more fancy :)#}
+            {% block footer %}
+                <span>&copy; DDraceNetwork 2016</span>
+            {% endblock %}
+        </footer>
+    </section>
+</article>
+</body>
+</html>
