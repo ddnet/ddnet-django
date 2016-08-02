@@ -4,6 +4,11 @@
 {# override the section_tilt block with custom header name #}
 {% block section_title %}Skins database{% endblock %}
 
+{% block scripts %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static "scripts/skins.js" %}"></script>
+{% endblock %}
+
 {# add some submenu on this page #}
 {% block sub_menu %}
     <ul>
@@ -19,7 +24,10 @@
         {% for i in items %}
             <li>
                 {{ i }}
-                <img src="{{ i.skin_image.url }}"/></a>
+                {# "display: none;" here will preserve the view to present the raw image before skin is rendered#}
+                <a href="{{ i.skin_image.url }}">
+                    <img src="{{ i.skin_image.url }}" onload="renderSkin(this);" style="display: none;"/>
+                </a>
             </li>
         {% endfor %}
     </ul>
