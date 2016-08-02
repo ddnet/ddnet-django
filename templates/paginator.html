@@ -1,0 +1,26 @@
+{# This template provides pagination for listviews and can be included in other templates.  #}
+
+{% if is_paginated %}
+    <div class="pagination">
+        <ul>
+            {% paginate_range page_obj.number page_obj.paginator.page_range as range %}
+            {% if page_obj.has_previous %}
+                <li><a href="?{% url_replace request 'page' page_obj.previous_page_number %}"><</a></li>
+                {% if 1 not in range %}
+                    <li><a href="?{% url_replace request 'page' 1 %}">1</a></li>
+                    <li>...</li>
+                {% endif %}
+            {% endif %}
+            {% for i in range %}
+                <li class="{% if i == page_obj.number %}active{% endif %}"><a href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+                {% if page_obj.paginator.num_pages not in range %}
+                <li>...</li>
+                    <li><a href="?{% url_replace request 'page' page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a></li>
+                {% endif %}
+                <li><a href="?{% url_replace request 'page' page_obj.next_page_number %}">></a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
