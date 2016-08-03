@@ -21,3 +21,56 @@ function renderSkin(skin) {
     //replace with image
     skin.parentNode.replaceChild(canvas, skin);
 }
+
+function postAddSkinToDownload(skinIndex, skinName) {
+    $.ajax({
+        url: 'add-to-download',
+        type: 'post',
+        data: {
+            skinName: skinName,
+            csrfmiddlewaretoken: CURRENT_CSRF_TOKEN
+        },
+        success: function (data) {
+            //hide 'add to download' button
+            $('#skin-add-to-download-button-' + skinIndex).hide();
+            //show 'remove from download' button
+            $('#skin-remove-from-download-button-' + skinIndex).show();
+            console.log(data);
+            $('#selected-skins-num-span').text(data);
+        }
+    });
+}
+
+function postRemoveSkinFromDownload(skinIndex, skinName) {
+    $.ajax({
+        url: 'remove-from-download',
+        type: 'post',
+        data: {
+            skinName: skinName,
+            csrfmiddlewaretoken: CURRENT_CSRF_TOKEN
+        },
+        success: function (data) {
+            //show 'add to download' button
+            $('#skin-add-to-download-button-' + skinIndex).show();
+            //hide 'remove from download' button
+            $('#skin-remove-from-download-button-' + skinIndex).hide();
+            console.log(data);
+            $('#selected-skins-num-span').text(data);
+        }
+    });
+}
+
+function postClearDownloadList() {
+    $.ajax({
+        url: 'clear-download-list',
+        type: 'post',
+        data: {
+            csrfmiddlewaretoken: CURRENT_CSRF_TOKEN
+        },
+        success: function (data) {
+            $('.skin-add-to-download-button').show();
+            $('.skin-remove-from-download-button').hide();
+            $('#selected-skins-num-span').text(0);
+        }
+    });
+}
