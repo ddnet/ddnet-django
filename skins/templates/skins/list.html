@@ -24,8 +24,7 @@
         <a href="#" onclick="return false;">Download [{{ items_total_count }}]</a>
         <br/>
         <a href="#" onclick="return false;">Download selected [<span id="selected-skins-num-span">{{ selected_skins_to_download|length }}</span>]</a>
-        <img src="{% static "images/icons/refresh_icon.png" %}" title="Clear download list"
-             onclick="postClearDownloadList();"/>
+        <img src="{% static "images/icons/refresh_icon.png" %}" title="Clear download list" onclick="postClearDownloadList();"/>
     </div>
 
     <ul>
@@ -51,8 +50,7 @@
                      onclick="postRemoveSkinFromDownload({{ forloop.counter0 }}, '{{ i.name }}');"
                         {% if not i.name in selected_skins_to_download %}
                      style="display: none;"
-                        {% endif %}
-                />
+                        {% endif %}  />
             </li>
         {% endfor %}
     </ul>

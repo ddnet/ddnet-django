@@ -115,6 +115,7 @@ STATICFILES_DIRS = [
 STATIC_ROOT = '/var/www/django/static'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+SKINS_ZIP_ARCHIVE = os.path.join(MEDIA_ROOT, 'skins.zip')
 
 MEDIA_URL = '/media/'
 
