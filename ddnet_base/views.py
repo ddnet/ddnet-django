@@ -33,14 +33,3 @@ class DDListView(ListView, ClassFactory):
             return [self.template_name]
         else:
             return [self.model._meta.app_label + '/list.html']  # noqa
-
-    def get(self, request, *args, **kwargs):
-        # get total count
-        self.items_total_count = self.get_queryset().count()
-        return super(DDListView, self).get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(DDListView, self).get_context_data(**kwargs)
-        # pass total count to the template
-        context['items_total_count'] = self.items_total_count
-        return context

@@ -12,7 +12,15 @@ class SkinListView(DDListView):
     def get_context_data(self, **kwargs):
         context = super(SkinListView, self).get_context_data(**kwargs)
         context['selected_skins_to_download'] = SessionAttributeUtil.get(self.request, SessionAttribute.SELECTED_SKINS, [])
+        # pass total count to the template
+        context['items_total_count'] = self.items_total_count
         return context
+
+    def get(self, request, *args, **kwargs):
+        # get total count
+        self.items_total_count = self.get_queryset().count()
+        return super(SkinListView, self).get(request, *args, **kwargs)
+
 
 
 # Additional view methods
