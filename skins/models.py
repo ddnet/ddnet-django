@@ -19,7 +19,6 @@ class Skin(models.Model):
 
     list_filter = [
         'pack',
-        'creator',
     ]
 
     def __str__(self):

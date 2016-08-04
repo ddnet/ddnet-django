@@ -45,3 +45,17 @@ def url_replace(request, *args):
         else:
             dict_[field] = value
     return dict_.urlencode()
+
+
+@register.filter
+def addstr(arg1, arg2):
+    '''Concatenate arg1 & arg2.'''
+
+    return str(arg1) + str(arg2)
+
+
+@register.filter
+def get_item(dict_, key):
+    '''Get the key from a dict.'''
+
+    return dict_.get(key)
