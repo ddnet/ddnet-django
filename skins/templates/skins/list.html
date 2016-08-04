@@ -20,6 +20,10 @@
 
 {# put the main content #}
 {% block content %}
+
+    {% include "search.html" %}
+    {% include "filter.html" %}
+
     <div id="download-buttons-div">
         <a href="#" onclick="return false;">Download [{{ items_total_count }}]</a>
         <br/>

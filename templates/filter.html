@@ -1,0 +1,23 @@
+{% for filter_name, filter_values in filter_options.items %}
+    <table>
+        {% with "filter_"|addstr:filter_name as f %}
+            <thead>
+                <tr>
+                    <th>{{ filter_name }}</th>
+                </tr>
+            </thead>
+            <tr {% if not filters or filter_name not in filters %}class="active"{% endif %}>
+                <td>
+                    <a style="display:block" href="?{% url_replace request f %}">All</a>
+                </td>
+            </tr>
+            {% for key, description in filter_values %}
+                <tr {% if key == filters|get_item:filter_name %}class="active"{% endif %}>
+                    <td>
+                        <a style="display:block" href="?{% url_replace request f key "page" %}">{{ description }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endwith %}
+    </table>
+{% endfor %}

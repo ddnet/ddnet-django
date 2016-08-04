@@ -13,6 +13,19 @@ class Skin(models.Model):
     release_date = models.DateTimeField(default=datetime.now)
     skin_image = models.ImageField(upload_to='skins')
 
+    searchfields = [
+        'name',
+    ]
+
+    list_filter = [
+        'pack',
+    ]
+
     def __str__(self):
         '''Stringrepresentation of this model.'''
         return self.name
+
+    class Meta:
+        '''Metaoptions.'''
+
+        ordering = ['name']

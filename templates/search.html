@@ -1,0 +1,35 @@
+<form method="get" role="form" action>
+    <div>
+        <label for="id_filter">Search:</label>
+        <input type="text" id="id_filter" name="q" value="{{ query }}"/>
+    </div>
+    <div>
+        <label for="id_order">Order by:</label>
+        <select id="id_order" name="o">
+            {% if order_by %}
+                {% for choice in order_choices %}
+                    <option {% if choice == order_by %}selected="selected"{% endif %} >{{ choice }}</option>
+                {% endfor %}
+            {% else %}
+                {% for choice in order_choices %}
+                    <option {% if choice == "id" %}selected="selected"{% endif %} >{{ choice }}</option>
+                {% endfor %}
+            {% endif %}
+        </select>
+        <div>
+            <label><input type="checkbox" name="desc" {% if descending %}checked{% endif %}>Descending</label>
+        </div>
+    </div>
+    <div>
+        <input type="submit"/>
+    </div>
+    {# Preserve other variables in GET #}
+    {% for k, v in request.GET.items %}
+        {# Exceptions are those that are set by this searchform and the page variable #}
+        {# keeping the same pagenumber after a search is useless #}
+        {% if k == "o" or k == "q" or k == "desc" or k == "page"%}
+        {% else %}
+            <input type="hidden" name="{{ k }}" value="{{ v }}"/>
+        {% endif %}
+    {% endfor %}
+</form>
