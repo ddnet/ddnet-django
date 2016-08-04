@@ -1,7 +1,7 @@
 '''Provide global custom tags for templates.'''
 
 from django import template
-
+from itertools import zip_longest
 
 __all__ = (
     'register',
@@ -26,12 +26,22 @@ def paginate_range(page_number, page_range, distance=5):
 
 
 @register.simple_tag
-def url_replace(request, field, value):
+def url_replace(request, *args):
     '''
-    Change the value of a variable from a GET request.
+    Change the value of a field from a GET request.
 
-    If the variable was not specified previously it will be newly created.
+    If value is left blank or set to None the field will be removed.
+
+    args will be interpreted like this: [field, value, field, value, field ...].
     '''
     dict_ = request.GET.copy()
-    dict_[field] = value
+
+    for field, value in zip_longest(args[::2], args[1::2], fillvalue=None):
+        if value is None:
+            try:
+                dict_.pop(field)
+            except KeyError:
+                pass
+        else:
+            dict_[field] = value
     return dict_.urlencode()
