@@ -25,9 +25,9 @@
     {% include "filter.html" %}
 
     <div id="download-buttons-div">
-        <a href="#" onclick="return false;">Download [{{ items_total_count }}]</a>
+        <a href="{{ full_skins_pack_zip_url }}" >Download [{{ items_total_count }}]</a>
         <br/>
-        <a href="#" onclick="return false;">Download selected [<span id="selected-skins-num-span">{{ selected_skins_to_download|length }}</span>]</a>
+        <a href="download-selected">Download selected [<span id="selected-skins-num-span">{{ selected_skins_to_download|length }}</span>]</a>
         <img src="{% static "images/icons/refresh_icon.png" %}" title="Clear download list" onclick="postClearDownloadList();"/>
     </div>
 
@@ -41,20 +41,25 @@
                 </a>
 
                 {# check if item is added to the download skin list#}
-                <img id="skin-add-to-download-button-{{ forloop.counter0 }}" class="skin-add-to-download-button"
-                     src="{% static "images/icons/add_icon.png" %}" title="Add skin to download"
-                     onclick="postAddSkinToDownload({{ forloop.counter0 }}, '{{ i.name }}');"
-                        {% if i.name in selected_skins_to_download %}
-                     style="display: none;"
-                        {% endif %}
-                >
-                <img id="skin-remove-from-download-button-{{ forloop.counter0 }}"
-                     class="skin-remove-from-download-button"
-                     src="{% static "images/icons/remove_icon.png" %}" title="Remove skin from download"
-                     onclick="postRemoveSkinFromDownload({{ forloop.counter0 }}, '{{ i.name }}');"
-                        {% if not i.name in selected_skins_to_download %}
-                     style="display: none;"
-                        {% endif %}  />
+                {% with is_skin_selected=selected_skins_to_download|contains:i.skin_image.name %}
+                    <img id="skin-add-to-download-button-{{ forloop.counter0 }}" class="skin-add-to-download-button"
+                         src="{% static "images/icons/add_icon.png" %}" title="Add skin to download"
+                         onclick="postAddSkinToDownload({{ forloop.counter0 }}, '{{ i.skin_image.name }}');"
+                            {# if skin is not selected then hide the remove button#}
+                            {% if is_skin_selected %}
+                         style="display: none;"
+                            {% endif %}
+                    />
+                    <img id="skin-remove-from-download-button-{{ forloop.counter0 }}"
+                         class="skin-remove-from-download-button"
+                         src="{% static "images/icons/remove_icon.png" %}" title="Remove skin from download"
+                         onclick="postRemoveSkinFromDownload({{ forloop.counter0 }}, '{{ i.skin_image.name }}');"
+                            {# if skin is not selected then hide the remove button#}
+                            {% if not is_skin_selected %}
+                         style="display: none;"
+                            {% endif %}
+                    />
+                {% endwith %}
             </li>
         {% endfor %}
     </ul>

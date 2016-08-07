@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^$', SkinListView.as_view(), name='skin_list'),
     url(r'^add-to-download', views.add_to_download),
     url(r'^remove-from-download$', views.remove_from_download),
-    url(r'^clear-download-list$', views.clear_download_list)
+    url(r'^clear-download-list$', views.clear_download_list),
+    url(r'^download-selected$', views.download_selected)
 ]

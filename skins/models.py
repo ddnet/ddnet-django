@@ -1,6 +1,6 @@
 '''Models for the skindatabase.'''
-
 from datetime import datetime
+
 from django.db import models
 
 

@@ -9,7 +9,6 @@ __all__ = (
     'url_replace'
 )
 
-
 register = template.Library()
 
 
@@ -59,3 +58,10 @@ def get_item(dict_, key):
     '''Get the key from a dict.'''
 
     return dict_.get(key)
+
+
+@register.filter
+def contains(dict_, item):
+    if not dict_:
+        return False
+    return item in dict_

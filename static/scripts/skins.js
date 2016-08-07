@@ -35,7 +35,6 @@ function postAddSkinToDownload(skinIndex, skinName) {
             $('#skin-add-to-download-button-' + skinIndex).hide();
             //show 'remove from download' button
             $('#skin-remove-from-download-button-' + skinIndex).show();
-            console.log(data);
             $('#selected-skins-num-span').text(data);
         }
     });
@@ -54,7 +53,6 @@ function postRemoveSkinFromDownload(skinIndex, skinName) {
             $('#skin-add-to-download-button-' + skinIndex).show();
             //hide 'remove from download' button
             $('#skin-remove-from-download-button-' + skinIndex).hide();
-            console.log(data);
             $('#selected-skins-num-span').text(data);
         }
     });
