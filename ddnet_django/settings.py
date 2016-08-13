@@ -121,6 +121,8 @@ MEDIA_URL = '/media/'
 
 LOGIN_URL = '/login/'
 
+DATABASE_ROUTERS = ['ddnet_django.db_routers.DefaultRouter']
+
 from .settings_private import * # noqa - settings_private has higher precedence than settings
 
 
@@ -140,6 +142,7 @@ from .settings_private import * # noqa - settings_private has higher precedence 
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 # DATABASES = {
+#     # this is where django-internal stuff goes
 #     'default': {
 #         'ENGINE': '',
 #         'NAME': '',
@@ -147,5 +150,15 @@ from .settings_private import * # noqa - settings_private has higher precedence 
 #         'PASSWORD': '',
 #         'HOST': '',
 #         'PORT': '',
-#     }
+#     },
+#
+#     # this is the db to use for the skins app
+#     'skins_db': {
+#         'ENGINE': '',
+#         'NAME': '',
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#     },
 # }
