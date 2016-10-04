@@ -3,3 +3,5 @@
 django
 Pillow
 pytz
+msgpack-python
+pypng>=0.0.12
