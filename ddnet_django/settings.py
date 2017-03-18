@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,8 +124,7 @@ LOGIN_URL = '/login/'
 
 DATABASE_ROUTERS = ['ddnet_django.db_routers.DefaultRouter']
 
-from .settings_private import * # noqa - settings_private has higher precedence than settings
-
+EXTRA_URLS = []
 
 # Create a file settings_private.py and put the following configuration-options there so they are
 # not kept under versioncontrol

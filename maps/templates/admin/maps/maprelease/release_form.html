@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+
+<h1>Release</h1>
+<h2>{{ object }}</h2>
+
+{% if object.release_state == 0 %}
+<form enctype="multipart/form-data" action="" method="post" id="maprelease_form" novalidate>
+    <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}' />
+    <div class="submit-row">
+        <input type="submit" value="Release" class="default" name="_release" />
+    </div>
+</form>
+{% elif object.release_state == 1 %}
+PENDING
+{% elif object.release_state == 2 %}
+DONE
+{% elif object.release_state == 3 %}
+FAILED
+{% endif %}
+{% endblock %}

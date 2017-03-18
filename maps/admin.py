@@ -1,5 +1,6 @@
-from django.contrib import admin
+from django.conf.urls import url
 
+from ddnet_django import admin
 from .models import MapRelease, ServerType, Map
 
 
