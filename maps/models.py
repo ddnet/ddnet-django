@@ -45,6 +45,9 @@ class MapRelease(models.Model):
         default=0, choices=((v.value, n) for n, v in RELEASE.__members__.items())
     )
 
+    class Meta:
+        permissions = (('can_release_map', 'Can release maps'),)
+
     def __str__(self):
         return self.name
 
@@ -57,10 +60,11 @@ class Map(models.Model):
     mapper = models.CharField(max_length=128)
     points = models.IntegerField(default=0)
     stars = models.IntegerField(default=0, choices=STARS)
-    timestamp = models.DateTimeField(db_column='TimeStamp')
+    timestamp = models.DateTimeField(db_column='TimeStamp', blank=True)
 
     class Meta:
         db_table = 'record_maps'
+        managed = False
 
     def save(self, *args, **kwargs):
         self.points = self.stars * self.server_type.multiplier + self.server_type.offset
