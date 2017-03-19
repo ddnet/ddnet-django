@@ -124,6 +124,8 @@ LOGIN_URL = '/login/'
 
 DATABASE_ROUTERS = ['ddnet_django.db_routers.DefaultRouter']
 
+FIXTURE_DIRS = ['fixtures']
+
 EXTRA_URLS = []
 
 # Create a file settings_private.py and put the following configuration-options there so they are
@@ -154,6 +156,16 @@ EXTRA_URLS = []
 #
 #     # this is the db to use for the skins app
 #     'skins_db': {
+#         'ENGINE': '',
+#         'NAME': '',
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#     },
+#
+#     # this is the db to use for the maps app
+#     'maps_db': {
 #         'ENGINE': '',
 #         'NAME': '',
 #         'USER': '',

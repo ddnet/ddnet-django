@@ -34,7 +34,7 @@ def map_name(instance, filename):
 
 class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    ddmap = models.FileField('map', upload_to=map_name)
+    ddmap = models.FileField(upload_to=map_name)
     img = models.ImageField(upload_to='maprelease', validators=[image_validator(1440, 900)])
 
     server_type = models.ForeignKey(ServerType, on_delete=models.DO_NOTHING)
@@ -50,14 +50,21 @@ class MapRelease(models.Model):
 
 
 class Map(models.Model):
-    name = models.CharField('Map', max_length=128, primary_key=True)
+    name = models.CharField(db_column='Map', max_length=128, primary_key=True)
     server_type = models.ForeignKey(
-        name='Server', to=ServerType, to_field='name', on_delete=models.DO_NOTHING
+        db_column='Server', to=ServerType, to_field='name', on_delete=models.DO_NOTHING
     )
     mapper = models.CharField(max_length=128)
     points = models.IntegerField(default=0)
     stars = models.IntegerField(default=0, choices=STARS)
-    timestamp = models.DateTimeField('TimeStamp')
+    timestamp = models.DateTimeField(db_column='TimeStamp')
+
+    class Meta:
+        db_table = 'record_maps'
+
+    def save(self, *args, **kwargs):
+        self.points = self.stars * self.server_type.multiplier + self.server_type.offset
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

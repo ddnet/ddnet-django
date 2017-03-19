@@ -2,6 +2,7 @@
 
 APP_DATABASES = {
     'skins': 'skins_db',
+    'maps': 'ddnet_db',
 }
 
 
