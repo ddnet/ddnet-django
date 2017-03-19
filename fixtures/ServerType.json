@@ -1,0 +1,74 @@
+[
+    {
+        "model": "maps.servertype",
+        "pk": 1,
+        "fields": {
+            "name": "Novice",
+            "offset": 0,
+            "multiplier": 1
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 2,
+        "fields": {
+            "name": "Moderate",
+            "offset": 5,
+            "multiplier": 2
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 3,
+        "fields": {
+            "name": "Brutal",
+            "offset": 15,
+            "multiplier": 3
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 4,
+        "fields": {
+            "name": "Race",
+            "offset": 0,
+            "multiplier": 2
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 5,
+        "fields": {
+            "name": "Solo",
+            "offset": 0,
+            "multiplier": 4
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 6,
+        "fields": {
+            "name": "Dummy",
+            "offset": 5,
+            "multiplier": 5
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 7,
+        "fields": {
+            "name": "DDmaX",
+            "offset": 0,
+            "multiplier": 4
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 8,
+        "fields": {
+            "name": "Oldschool",
+            "offset": 0,
+            "multiplier": 6
+        }
+    }
+]
