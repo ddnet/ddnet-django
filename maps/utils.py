@@ -4,7 +4,7 @@ from .models import Map, MapCategory
 
 
 def print_map(m):
-    if m.mapper and m.mapper != 'Unknown Mapper':
+    if m.mapper and m.mapper != 'Unknown Mapper':
         print(str(m.stars) + '|' + m.name + '|' + m.mapper)
     else:
         print(str(m.stars) + '|' + m.name)
