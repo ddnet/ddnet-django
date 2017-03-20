@@ -17,7 +17,7 @@ import django
 from django.utils.timezone import get_current_timezone
 from django.core.files.base import ContentFile
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ddnet_django.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ddnet_django.settings_private")
 django.setup()
 
 from skins.models import Skin # noqa - need to setup django first

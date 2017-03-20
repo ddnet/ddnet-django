@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin
 
 from ddnet_django import admin
-from .models import MapRelease, ServerType, Map
+from .models import MapRelease, ServerType, Map, MapCategory
 
 
 class MapAdmin(ModelAdmin):
@@ -15,6 +15,7 @@ class MapAdmin(ModelAdmin):
 
     list_filter = (
         'server_type',
+        'categories',
     )
     search_fields = (
         'name',
@@ -24,4 +25,5 @@ class MapAdmin(ModelAdmin):
 
 admin.site.register(MapRelease)
 admin.site.register(ServerType)
+admin.site.register(MapCategory)
 admin.site.register(Map, MapAdmin)

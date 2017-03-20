@@ -1,0 +1,93 @@
+[
+    {
+        "model": "maps.mapcategory",
+        "pk": 1,
+        "fields": {
+            "name": "SELECTED MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 2,
+        "fields": {
+            "name": "3 PLAYER MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 3,
+        "fields": {
+            "name": "4 PLAYER MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 4,
+        "fields": {
+            "name": "MAPS WITH SOUND"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 5,
+        "fields": {
+            "name": "PUSH HOOK MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 6,
+        "fields": {
+            "name": "SPECIAL MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 7,
+        "fields": {
+            "name": "WALLJUMP MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 8,
+        "fields": {
+            "name": "OLD MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 9,
+        "fields": {
+            "name": "DDRACEMAX.EASY MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 10,
+        "fields": {
+            "name": "DDRACEMAX.NEXT MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 11,
+        "fields": {
+            "name": "DDRACEMAX.NUT MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 12,
+        "fields": {
+            "name": "DDRACEMAX.PRO MAPS"
+        }
+    },
+    {
+        "model": "maps.mapcategory",
+        "pk": 13,
+        "fields": {
+            "name": "JETPACK MAPS"
+        }
+    }
+]

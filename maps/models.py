@@ -28,6 +28,13 @@ class RELEASE(enum.Enum):
     FAILED = 3
 
 
+class MapCategory(models.Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+
 def map_name(instance, filename):
     return 'maprelease/' + instance.name + '.map'
 
@@ -35,9 +42,12 @@ def map_name(instance, filename):
 class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True)
     ddmap = models.FileField(upload_to=map_name)
+    mapper = models.CharField(max_length=128, blank=True)
     img = models.ImageField(upload_to='maprelease', validators=[image_validator(1440, 900)])
 
     server_type = models.ForeignKey(ServerType, on_delete=models.DO_NOTHING)
+    categories = models.ManyToManyField(to=MapCategory, blank=True)
+
     stars = models.IntegerField(default=0, choices=STARS)
 
     release_date = models.DateTimeField()
@@ -57,7 +67,8 @@ class Map(models.Model):
     server_type = models.ForeignKey(
         db_column='Server', to=ServerType, to_field='name', on_delete=models.DO_NOTHING
     )
-    mapper = models.CharField(max_length=128)
+    categories = models.ManyToManyField(to=MapCategory, blank=True)
+    mapper = models.CharField(max_length=128, blank=True)
     points = models.IntegerField(default=0)
     stars = models.IntegerField(default=0, choices=STARS)
     timestamp = models.DateTimeField(db_column='TimeStamp', blank=True)
