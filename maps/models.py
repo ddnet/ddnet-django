@@ -68,10 +68,10 @@ class Map(models.Model):
         db_column='Server', to=ServerType, to_field='name', on_delete=models.DO_NOTHING
     )
     categories = models.ManyToManyField(to=MapCategory, blank=True)
-    mapper = models.CharField(max_length=128, blank=True)
-    points = models.IntegerField(default=0)
-    stars = models.IntegerField(default=0, choices=STARS)
-    timestamp = models.DateTimeField(db_column='TimeStamp', blank=True)
+    mapper = models.CharField(db_column='Mapper', max_length=128, blank=True)
+    points = models.IntegerField(db_column='Points', default=0)
+    stars = models.IntegerField(db_column='Stars', default=0, choices=STARS)
+    timestamp = models.DateTimeField(db_column='Timestamp', blank=True)
 
     class Meta:
         db_table = 'record_maps'
