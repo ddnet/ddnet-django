@@ -30,6 +30,7 @@ class RELEASE(enum.Enum):
 
 class MapCategory(models.Model):
     name = models.CharField(max_length=64)
+    order = models.IntegerField()
 
     def __str__(self):
         return self.name

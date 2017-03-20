@@ -3,91 +3,104 @@
         "model": "maps.mapcategory",
         "pk": 1,
         "fields": {
-            "name": "SELECTED MAPS"
+            "name": "SELECTED MAPS",
+            "order": 1
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 2,
         "fields": {
-            "name": "3 PLAYER MAPS"
+            "name": "3 PLAYER MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 3,
         "fields": {
-            "name": "4 PLAYER MAPS"
+            "name": "4 PLAYER MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 4,
         "fields": {
-            "name": "MAPS WITH SOUND"
+            "name": "MAPS WITH SOUND",
+            "order": 2
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 5,
         "fields": {
-            "name": "PUSH HOOK MAPS"
+            "name": "PUSH HOOK MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 6,
         "fields": {
-            "name": "SPECIAL MAPS"
+            "name": "SPECIAL MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 7,
         "fields": {
-            "name": "WALLJUMP MAPS"
+            "name": "WALLJUMP MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 8,
         "fields": {
-            "name": "OLD MAPS"
+            "name": "OLD MAPS",
+            "order": 101
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 9,
         "fields": {
-            "name": "DDRACEMAX.EASY MAPS"
+            "name": "DDRACEMAX.EASY MAPS",
+            "order": 1
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 10,
         "fields": {
-            "name": "DDRACEMAX.NEXT MAPS"
+            "name": "DDRACEMAX.NEXT MAPS",
+            "order": 2
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 11,
         "fields": {
-            "name": "DDRACEMAX.NUT MAPS"
+            "name": "DDRACEMAX.NUT MAPS",
+            "order": 4
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 12,
         "fields": {
-            "name": "DDRACEMAX.PRO MAPS"
+            "name": "DDRACEMAX.PRO MAPS",
+            "order": 3
         }
     },
     {
         "model": "maps.mapcategory",
         "pk": 13,
         "fields": {
-            "name": "JETPACK MAPS"
+            "name": "JETPACK MAPS",
+            "order": 3
         }
     }
 ]

@@ -23,7 +23,14 @@ class MapAdmin(ModelAdmin):
     )
 
 
+class MapCategoryAdmin(ModelAdmin):
+    list_display = (
+        'name',
+        'order'
+    )
+
+
 admin.site.register(MapRelease)
 admin.site.register(ServerType)
-admin.site.register(MapCategory)
+admin.site.register(MapCategory, MapCategoryAdmin)
 admin.site.register(Map, MapAdmin)
