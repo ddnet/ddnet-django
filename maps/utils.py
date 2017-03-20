@@ -14,8 +14,8 @@ def print_mapfile(server_type):
     categories = MapCategory.objects.order_by('name')
 
     print('$add_vote "Make sure no one is racing before voting!" "info"')
-    print('$add_vote "Random Novice Map" "random_map"')
-    print('$add_vote "Random Novice Map Unfinished by Vote Caller" "random_unfinished_map"')
+    print('$add_vote "Random {} Map" "random_map"'.format(server_type))
+    print('$add_vote "Random {} Map Unfinished by Vote Caller" "random_unfinished_map"'.format(server_type))
     print()
 
     print('─── NEW MAPS ───')
