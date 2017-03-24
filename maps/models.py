@@ -1,7 +1,11 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 import enum
 
 from ddnet_base.validtors import image_validator
+from ddnet_django.storage import get_valid_name
+
+from .fields import MapFileField, MapImageField
 
 STARS = (
     (0, '☆☆☆☆☆'),
@@ -36,15 +40,17 @@ class MapCategory(models.Model):
         return self.name
 
 
-def map_name(instance, filename):
-    return 'maprelease/' + instance.name + '.map'
+def validate_mapname(name):
+    valid_name = get_valid_name(name)
+    if name != valid_name:
+        raise ValidationError('{} is not a valid Mapname, try {} instead.'.format(name, valid_name))
 
 
 class MapRelease(models.Model):
-    name = models.CharField(max_length=128, unique=True)
-    ddmap = models.FileField(upload_to=map_name)
+    name = models.CharField(max_length=128, unique=True, validators=[validate_mapname])
+    ddmap = MapFileField(upload_to='mapreleases')
     mapper = models.CharField(max_length=128, blank=True)
-    img = models.ImageField(upload_to='maprelease', validators=[image_validator(1440, 900)])
+    img = MapImageField(upload_to='mapreleases', validators=[image_validator(1440, 900)])
 
     server_type = models.ForeignKey(ServerType, on_delete=models.DO_NOTHING)
     categories = models.ManyToManyField(to=MapCategory, blank=True)

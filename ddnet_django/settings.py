@@ -126,6 +126,8 @@ DATABASE_ROUTERS = ['ddnet_django.db_routers.DefaultRouter']
 
 FIXTURE_DIRS = ['fixtures']
 
+DEFAULT_FILE_STORAGE = 'ddnet_django.storage.DDNetFileSystemStorage'
+
 EXTRA_URLS = []
 
 # Create a file settings_private.py and put the following configuration-options there so they are
