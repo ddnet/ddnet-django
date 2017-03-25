@@ -22,8 +22,8 @@ class DDNetAdmin(admin.AdminSite):
 
 
 site = DDNetAdmin()
-MapReleaseView.each_context = site.each_context
-MapFixView.each_context = site.each_context
+MapReleaseView.admin = site
+MapFixView.admin = site
 
 site.register(Group, GroupAdmin)
 site.register(User, UserAdmin)

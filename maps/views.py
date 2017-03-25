@@ -60,12 +60,16 @@ def release_map(m):
 class MapReleaseView(PermissionRequiredMixin, SingleObjectMixin, View):
     model = MapRelease
     template_name = 'admin/maps/maprelease/release_form.html'
-    each_context = None
+    admin = None
     permission_required = 'maps.can_release_map'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx.update(self.each_context(self.request))
+        ctx.update(self.admin.each_context(self.request))
+        ctx.update({
+            'opts': self.model._meta,
+            'app_label': self.model._meta.app_label,
+        })
         if self.object.release_state == PROCESS.PENDING.value:
             ctx['log'] = RLOGS[self.object.pk]
         return ctx
@@ -119,12 +123,16 @@ def fix_map(m):
 class MapFixView(PermissionRequiredMixin, SingleObjectMixin, View):
     model = MapFix
     template_name = 'admin/maps/mapfix/fix_form.html'
-    each_context = None
+    admin = None
     permission_required = 'maps.can_release_map'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx.update(self.each_context(self.request))
+        ctx.update(self.admin.each_context(self.request))
+        ctx.update({
+            'opts': self.model._meta,
+            'app_label': self.model._meta.app_label,
+        })
         if self.object.fix_state == PROCESS.PENDING.value:
             ctx['log'] = FLOGS[self.object.pk]
         return ctx
