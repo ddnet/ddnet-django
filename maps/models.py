@@ -61,6 +61,7 @@ class MapRelease(models.Model):
     release_state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in RELEASE.__members__.items())
     )
+    log = models.TextField(default='', blank=True, editable=False)
 
     class Meta:
         permissions = (('can_release_map', 'Can release maps'),)

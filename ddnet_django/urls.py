@@ -24,4 +24,5 @@ from .admin import site
 urlpatterns = [
     url(r'^admin/', site.urls),
     url(r'^skins/', include('skins.urls'), name='skins'),
+    url(r'^maps/', include('maps.urls'), name='maps'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + settings.EXTRA_URLS

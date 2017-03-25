@@ -1,5 +1,8 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 
 import os
 
@@ -8,8 +11,8 @@ from .models import MapRelease
 
 @receiver(post_delete, sender=MapRelease)
 def post_map_release_delete(sender, instance, **kwargs):
-    default_storage.delete(instance.ddmap.path)
-    default_storage.delete(instance.img.path)
+    instance.ddmap.storage.delete(instance.ddmap.name)
+    instance.img.storage.delete(instance.img.name)
 
 
 @receiver(post_save, sender=MapRelease)

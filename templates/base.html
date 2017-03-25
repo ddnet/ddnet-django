@@ -27,7 +27,7 @@ The above code will result in replacing section_title block in the base.html wit
     <link rel="stylesheet" href="{% static "css/style.css" %}"/>
     <link rel="shortcut icon" href="{%  static "favicon.ico" %}">
 
-    <script type="text/javascript" src="{% static "scripts/external/jquery-3.1.0.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
     <script type="text/javascript">
         {# global javascript csrf token#}
         var CURRENT_CSRF_TOKEN = '{{ csrf_token }}';

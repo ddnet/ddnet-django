@@ -1,4 +1,20 @@
 {% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{% load staticfiles %}
+<script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
+<script type="text/javascript">
+    var OBJECT_PK = '{{ object.pk }}';
+    {% if object.release_state == 1 %}
+        $(function () {
+            setTimeout(update_log, 1000);
+        });
+    {% endif %}
+</script>
+<script type="text/javascript" src="{% static "scripts/releaselog.js" %}"></script>
+<link rel="stylesheet" href="{% static "css/releaselog.css" %}"/>
+{% endblock %}
+
 {% block content %}
 
 <h1>Release</h1>
@@ -12,10 +28,19 @@
     </div>
 </form>
 {% elif object.release_state == 1 %}
-PENDING
+<h3>PENDING</h3>
+<pre id='log'>
+{{ log }}
+</pre>
 {% elif object.release_state == 2 %}
-DONE
+<h3>DONE</h3>
+<pre>
+{{ object.log }}
+</pre>
 {% elif object.release_state == 3 %}
-FAILED
+<h3>FAILED</h3>
+<pre>
+{{ object.log }}
+</pre>
 {% endif %}
 {% endblock %}
