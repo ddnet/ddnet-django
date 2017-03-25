@@ -45,6 +45,9 @@ def validate_mapname(name):
     if name != valid_name:
         raise ValidationError('{} is not a valid Mapname, try {} instead.'.format(name, valid_name))
 
+    if Map.objects.filter(pk=name):
+        raise ValidationError('The Map {} already exists.'.format(name))
+
 
 class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True, validators=[validate_mapname])
