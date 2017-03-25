@@ -41,19 +41,28 @@ FLOGS = Logs()
 
 
 def release_map(m):
-    q = Queue()
-    RLOGS[m.pk] = q
-    p = subprocess.Popen(['map_release'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in iter(p.stdout.readline, b''):
-        q.put(line.decode('utf-8'))
-    p.stdout.close()
-    returncode = p.wait()
-    m.log = RLOGS[m.pk]
-    del RLOGS[m.pk]
-    if returncode == 0:
-        m.release_state = PROCESS.DONE.value
-    else:
+    try:
+        q = Queue()
+        RLOGS[m.pk] = q
+        p = subprocess.Popen(
+            ['map_release', m.name, m.mapfile.path, m.img.path, m.mapper, m.server_type.name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        )
+        for line in iter(p.stdout.readline, b''):
+            q.put(line.decode('utf-8'))
+        p.stdout.close()
+        returncode = p.wait()
+        m.log = RLOGS[m.pk]
+        if returncode == 0:
+            m.release_state = PROCESS.DONE.value
+        else:
+            m.release_state = PROCESS.FAILED.value
+    except Exception as e:
         m.release_state = PROCESS.FAILED.value
+        m.log = str(e)
+    finally:
+        del RLOGS[m.pk]
     m.save()
 
 
@@ -104,19 +113,29 @@ class ReleaseLogView(PermissionRequiredMixin, View):
 
 
 def fix_map(m):
-    q = Queue()
-    FLOGS[m.pk] = q
-    p = subprocess.Popen(['map_release'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in iter(p.stdout.readline, b''):
-        q.put(line.decode('utf-8'))
-    p.stdout.close()
-    returncode = p.wait()
-    m.log = FLOGS[m.pk]
-    del FLOGS[m.pk]
-    if returncode == 0:
-        m.fix_state = PROCESS.DONE.value
-    else:
+    try:
+        q = Queue()
+        FLOGS[m.pk] = q
+        p = subprocess.Popen(
+            ['map_fix', m.mapfile.path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        )
+        for line in iter(p.stdout.readline, b''):
+            q.put(line.decode('utf-8'))
+        p.stdout.close()
+        returncode = p.wait()
+        m.log = FLOGS[m.pk]
+        if returncode == 0:
+            m.fix_state = PROCESS.DONE.value
+        else:
+            m.fix_state = PROCESS.FAILED.value
+    except Exception as e:
         m.fix_state = PROCESS.FAILED.value
+        m.log = str(e)
+    finally:
+        del FLOGS[m.pk]
+
     m.save()
 
 

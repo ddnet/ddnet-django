@@ -17,6 +17,10 @@ import django
 from django.utils.timezone import get_current_timezone
 from django.core.files.base import ContentFile
 
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'ddnet-django')
+)
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ddnet_django.settings_private")
 django.setup()
 
