@@ -6,12 +6,12 @@ from django.core.files.base import ContentFile
 
 import os
 
-from .models import MapRelease
+from .models import MapRelease, MapFix
 
 
 @receiver(post_delete, sender=MapRelease)
 def post_map_release_delete(sender, instance, **kwargs):
-    instance.ddmap.storage.delete(instance.ddmap.name)
+    instance.mapfile.storage.delete(instance.mapfile.name)
     instance.img.storage.delete(instance.img.name)
 
 
@@ -19,13 +19,13 @@ def post_map_release_delete(sender, instance, **kwargs):
 def post_map_release_save(sender, instance, **kwargs):
     changed = False
 
-    filename = instance.ddmap.field.generate_filename(instance, instance.name)
-    if filename != instance.ddmap.name:
+    filename = instance.mapfile.field.generate_filename(instance, instance.name)
+    if filename != instance.mapfile.name:
         try:
-            os.rename(instance.ddmap.path, instance.ddmap.storage.path(filename))
+            os.rename(instance.mapfile.path, instance.mapfile.storage.path(filename))
         except FileNotFoundError:
             pass
-        instance.ddmap.name = filename
+        instance.mapfile.name = filename
         changed = True
 
     filename = instance.img.field.generate_filename(instance, instance.name)
@@ -38,4 +38,21 @@ def post_map_release_save(sender, instance, **kwargs):
         changed = True
 
     if changed:
+        instance.save()
+
+
+@receiver(post_delete, sender=MapFix)
+def post_map_fix_delete(sender, instance, **kwargs):
+    instance.mapfile.storage.delete(instance.mapfile.name)
+
+
+@receiver(post_save, sender=MapFix)
+def post_map_fix_save(sender, instance, **kwargs):
+    filename = instance.mapfile.field.generate_filename(instance, instance.name)
+    if filename != instance.mapfile.name:
+        try:
+            os.rename(instance.mapfile.path, instance.mapfile.storage.path(filename))
+        except FileNotFoundError:
+            pass
+        instance.mapfile.name = filename
         instance.save()

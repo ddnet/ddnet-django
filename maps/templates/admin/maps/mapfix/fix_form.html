@@ -2,11 +2,12 @@
 
 {% block extrahead %}
 {% load staticfiles %}
-{% if object.release_state == 1 %}
+{% if object.fix_state == 1 %}
     <script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "scripts/logupdate.js" %}"></script>
     <script type="text/javascript">
-        var LOG_URL = "/maps/api/release/log/{{ object.pk }}"
+        var LOG_URL = "/maps/api/fix/log/{{ object.pk }}"
+
             $(function () {
                 setTimeout(update_log, 1000);
             });
@@ -17,27 +18,27 @@
 
 {% block content %}
 
-<h1>Release</h1>
+<h1>Mapfix</h1>
 <h2>{{ object }}</h2>
 
-{% if object.release_state == 0 %}
-<form enctype="multipart/form-data" action="" method="post" id="maprelease_form" novalidate>
+{% if object.fix_state == 0 %}
+<form enctype="multipart/form-data" action="" method="post" id="mapfix_form" novalidate>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
     <div class="submit-row">
-        <input type="submit" value="Release" class="default" name="_release" />
+        <input type="submit" value="Fix" class="default" name="_release" />
     </div>
 </form>
-{% elif object.release_state == 1 %}
+{% elif object.fix_state == 1 %}
 <h3>PENDING</h3>
 <pre id="log">
 {{ log }}
 </pre>
-{% elif object.release_state == 2 %}
+{% elif object.fix_state == 2 %}
 <h3>DONE</h3>
 <pre>
 {{ object.log }}
 </pre>
-{% elif object.release_state == 3 %}
+{% elif object.fix_state == 3 %}
 <h3>FAILED</h3>
 <pre>
 {{ object.log }}

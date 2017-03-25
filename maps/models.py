@@ -25,7 +25,7 @@ class ServerType(models.Model):
     def __str__(self):
         return self.name
 
-class RELEASE(enum.Enum):
+class PROCESS(enum.Enum):
     NOT_STARTED = 0
     PENDING = 1
     DONE = 2
@@ -48,7 +48,7 @@ def validate_mapname(name):
 
 class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True, validators=[validate_mapname])
-    ddmap = MapFileField(upload_to='mapreleases')
+    mapfile = MapFileField(upload_to='mapreleases')
     mapper = models.CharField(max_length=128, blank=True)
     img = MapImageField(upload_to='mapreleases', validators=[image_validator(1440, 900)])
 
@@ -59,7 +59,7 @@ class MapRelease(models.Model):
 
     release_date = models.DateTimeField()
     release_state = models.IntegerField(
-        default=0, choices=((v.value, n) for n, v in RELEASE.__members__.items())
+        default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
     log = models.TextField(default='', blank=True, editable=False)
 
@@ -88,6 +88,22 @@ class Map(models.Model):
     def save(self, *args, **kwargs):
         self.points = self.stars * self.server_type.multiplier + self.server_type.offset
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
+class MapFix(models.Model):
+    ddmap = models.ForeignKey(Map)
+    mapfile = MapFileField(upload_to='mapfixes')
+    fix_state = models.IntegerField(
+        default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
+    )
+    log = models.TextField(default='', blank=True, editable=False)
+
+    @property
+    def name(self):
+        return self.ddmap.name
 
     def __str__(self):
         return self.name

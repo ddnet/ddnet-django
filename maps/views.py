@@ -8,10 +8,10 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, Http404
 
 
-from .models import MapRelease, RELEASE
+from .models import MapRelease, MapFix, PROCESS
 
 
-class ReleaseLogs:
+class Logs:
 
     def __init__(self):
         self._logs = {}
@@ -33,8 +33,11 @@ class ReleaseLogs:
     def __delitem__(self, key):
         self._logs.pop(key)
 
+# Releases
+RLOGS = Logs()
 
-RLOGS = ReleaseLogs()
+# Fixes
+FLOGS = Logs()
 
 
 def release_map(m):
@@ -48,9 +51,9 @@ def release_map(m):
     m.log = RLOGS[m.pk]
     del RLOGS[m.pk]
     if returncode == 0:
-        m.release_state = RELEASE.DONE.value
+        m.release_state = PROCESS.DONE.value
     else:
-        m.release_state = RELEASE.FAILED.value
+        m.release_state = PROCESS.FAILED.value
     m.save()
 
 
@@ -63,7 +66,7 @@ class MapReleaseView(PermissionRequiredMixin, SingleObjectMixin, View):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx.update(self.each_context(self.request))
-        if self.object.release_state == RELEASE.PENDING.value:
+        if self.object.release_state == PROCESS.PENDING.value:
             ctx['log'] = RLOGS[self.object.pk]
         return ctx
 
@@ -73,8 +76,8 @@ class MapReleaseView(PermissionRequiredMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.object.release_state == RELEASE.NOT_STARTED.value:
-            self.object.release_state = RELEASE.PENDING.value
+        if self.object.release_state == PROCESS.NOT_STARTED.value:
+            self.object.release_state = PROCESS.PENDING.value
             self.object.save()
 
             t = Thread(target=release_map, args=(self.object,))
@@ -90,6 +93,65 @@ class ReleaseLogView(PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = int(kwargs['pk'])
         s = RLOGS[pk]
+        if s is not None:
+            return HttpResponse(s)
+        else:
+            raise Http404
+
+
+def fix_map(m):
+    q = Queue()
+    FLOGS[m.pk] = q
+    p = subprocess.Popen(['map_release'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in iter(p.stdout.readline, b''):
+        q.put(line.decode('utf-8'))
+    p.stdout.close()
+    returncode = p.wait()
+    m.log = FLOGS[m.pk]
+    del FLOGS[m.pk]
+    if returncode == 0:
+        m.fix_state = PROCESS.DONE.value
+    else:
+        m.fix_state = PROCESS.FAILED.value
+    m.save()
+
+
+class MapFixView(PermissionRequiredMixin, SingleObjectMixin, View):
+    model = MapFix
+    template_name = 'admin/maps/mapfix/fix_form.html'
+    each_context = None
+    permission_required = 'maps.can_release_map'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx.update(self.each_context(self.request))
+        if self.object.fix_state == PROCESS.PENDING.value:
+            ctx['log'] = FLOGS[self.object.pk]
+        return ctx
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.fix_state == PROCESS.NOT_STARTED.value:
+            self.object.fix_state = PROCESS.PENDING.value
+            self.object.save()
+
+            t = Thread(target=fix_map, args=(self.object,))
+            t.daemon = True
+            t.start()
+
+        return render(request, self.template_name, self.get_context_data())
+
+
+class FixLogView(PermissionRequiredMixin, View):
+    permission_required = 'maps.can_release_map'
+
+    def get(self, request, *args, **kwargs):
+        pk = int(kwargs['pk'])
+        s = FLOGS[pk]
         if s is not None:
             return HttpResponse(s)
         else:
