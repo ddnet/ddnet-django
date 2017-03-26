@@ -6,8 +6,7 @@
     <script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "scripts/logupdate.js" %}"></script>
     <script type="text/javascript">
-        var LOG_URL = "/maps/api/fix/log/{{ object.pk }}"
-
+        var LOG_URL = "{% url 'maps:fix_log' object.pk %}"
             $(function () {
                 setTimeout(update_log, 1000);
             });
