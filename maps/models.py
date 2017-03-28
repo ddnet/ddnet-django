@@ -22,6 +22,9 @@ class ServerType(models.Model):
     offset = models.IntegerField()
     multiplier = models.IntegerField()
 
+    class Meta:
+        ordering = ('name',)
+
     def __str__(self):
         return self.name
 
@@ -35,6 +38,9 @@ class PROCESS(enum.Enum):
 class MapCategory(models.Model):
     name = models.CharField(max_length=64)
     order = models.IntegerField()
+
+    class Meta:
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -61,13 +67,13 @@ class MapRelease(models.Model):
     stars = models.IntegerField(default=0, choices=STARS)
 
     release_date = models.DateTimeField()
-    release_state = models.IntegerField(
+    state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
-    log = models.TextField(default='', blank=True, editable=False)
 
     class Meta:
         permissions = (('can_release_map', 'Can release maps'),)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -87,6 +93,7 @@ class Map(models.Model):
     class Meta:
         db_table = 'record_maps'
         managed = False
+        ordering = ('name',)
 
     def save(self, *args, **kwargs):
         self.points = self.stars * self.server_type.multiplier + self.server_type.offset
@@ -99,10 +106,13 @@ class Map(models.Model):
 class MapFix(models.Model):
     ddmap = models.ForeignKey(Map)
     mapfile = MapFileField(upload_to='mapfixes')
-    fix_state = models.IntegerField(
+    state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
-    log = models.TextField(default='', blank=True, editable=False)
+    timestamp = models.DateTimeField(blank=True)
+
+    class Meta:
+        ordering = ('mapfile',)
 
     @property
     def name(self):
@@ -110,3 +120,31 @@ class MapFix(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ReleaseLog(models.Model):
+    log = models.TextField(default='', blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+    state = models.IntegerField(
+        default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
+    )
+
+    class Meta:
+        ordering = ('timestamp',)
+
+    def __str__(self):
+        return str(self.timestamp)
+
+
+class FixLog(models.Model):
+    log = models.TextField(default='', blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+    state = models.IntegerField(
+        default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
+    )
+
+    class Meta:
+        ordering = ('timestamp',)
+
+    def __str__(self):
+        return str(self.timestamp)

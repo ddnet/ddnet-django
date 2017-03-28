@@ -2,11 +2,11 @@
 
 {% block extrahead %}
 {% load staticfiles %}
-{% if object.fix_state == 1 %}
+{% if pending_objects %}
     <script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "scripts/logupdate.js" %}"></script>
     <script type="text/javascript">
-        var LOG_URL = "{% url 'maps:fix_log' object.pk %}"
+        var LOG_URL = "{% url 'maps:fix_log' %}"
             $(function () {
                 setTimeout(update_log, 1000);
             });
@@ -22,37 +22,37 @@
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
 &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
-&rsaquo; <a href=".">{{ object|truncatewords:"18" }}</a>
 &rsaquo; fix
 </div>
 {% endblock %}
 
 {% block content %}
 
-<h1>Mapfix</h1>
-<h2>{{ object }}</h2>
-
-{% if object.fix_state == 0 %}
-<form enctype="multipart/form-data" action="" method="post" id="mapfix_form" novalidate>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
-    <div class="submit-row">
-        <input type="submit" value="Fix" class="default" name="_release" />
-    </div>
-</form>
-{% elif object.fix_state == 1 %}
-<h3>PENDING</h3>
+<h1>Release</h1>
+{% if pending_objects %}
 <pre id="log">
 {{ log }}
 </pre>
-{% elif object.fix_state == 2 %}
-<h3>DONE</h3>
-<pre>
-{{ object.log }}
-</pre>
-{% elif object.fix_state == 3 %}
-<h3>FAILED</h3>
-<pre>
-{{ object.log }}
+{% elif objects %}
+Release the following maps ?
+<ul>
+    {% for o in objects %}
+        <li>
+            {{ o }}
+        </li>
+    {% endfor %}
+</ul>
+<form enctype="multipart/form-data" action="" method="post" id="mapfix_form" novalidate>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+    <input type="hidden" name="ids" value="{{ ids }}" />
+    <div class="submit-row">
+        <input type="submit" value="Fix" class="default" name="_fix" />
+    </div>
+</form>
+{% else %}
+<h2>Done.</h2>
+<pre id="log">
+{{ log }}
 </pre>
 {% endif %}
 {% endblock %}

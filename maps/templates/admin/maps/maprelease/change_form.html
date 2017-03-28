@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load staticfiles %}
+{% load staticfiles admin_urls %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -9,11 +9,12 @@
 {% block submit_buttons_bottom %}
 <div class="submit-row">
     <input type="submit" value="Save" class="default" name="_save" />
+    {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
     <p class="deletelink-box">
-        <a href="/admin/maps/maprelease/{{ object_id }}/delete/" class="deletelink">Delete</a>
+        <a href="{% add_preserved_filters delete_url %}" class="deletelink">Delete</a>
     </p>
     {% if object_id != None %}
-        <a class="button big" href="../release">Release...</a>
+        <a class="button big" href="{% url 'admin:map_release' %}?ids={{ object_id }}">Release...</a>
     {% endif %}
     <input type="submit" value="Save and add another" name="_addanother" />
     <input type="submit" value="Save and continue editing" name="_continue" />

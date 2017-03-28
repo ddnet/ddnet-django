@@ -1,7 +1,10 @@
 from django.contrib.admin import ModelAdmin
+from django.http import HttpResponseRedirect
+from django.contrib import admin as dj_admin
+from django.urls import reverse
 
 from ddnet_django import admin
-from .models import MapRelease, ServerType, Map, MapCategory, MapFix, PROCESS
+from .models import MapRelease, ServerType, Map, MapCategory, MapFix, ReleaseLog, FixLog, PROCESS
 
 
 class MapAdmin(ModelAdmin):
@@ -30,21 +33,51 @@ class MapCategoryAdmin(ModelAdmin):
     )
 
 
+def release_action(modeladmin, request, queryset):
+    selected = request.POST.getlist(dj_admin.ACTION_CHECKBOX_NAME)
+    return HttpResponseRedirect(reverse('admin:map_release') + '?ids={}'.format(','.join(selected)))
+
+
+release_action.short_description = 'Release map(s)'
+
+
 class MapReleaseAdmin(ModelAdmin):
+    list_display = (
+        'name',
+        'state',
+        'release_date'
+    )
+    list_filter = ('state',)
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is not None and obj.release_state == PROCESS.PENDING.value:
-            return super().get_fields(request)
+        # if obj is not None and obj.state == PROCESS.PENDING.value:
+        #     return super().get_fields(request)
         return super().get_readonly_fields(request)
 
+    actions = [release_action]
+
+
+def fix_action(modeladmin, request, queryset):
+    selected = request.POST.getlist(dj_admin.ACTION_CHECKBOX_NAME)
+    return HttpResponseRedirect(reverse('admin:map_fix') + '?ids={}'.format(','.join(selected)))
+
+
+fix_action.short_description = 'Fix map(s)'
 
 class MapFixAdmin(ModelAdmin):
     raw_id_fields = ("ddmap",)
+    list_display = (
+        'name',
+        'state',
+        'timestamp'
+    )
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is not None and obj.fix_state == PROCESS.PENDING.value:
+        if obj is not None and obj.state == PROCESS.PENDING.value:
             return super().get_fields(request)
         return super().get_readonly_fields(request)
+
+    actions = [fix_action]
 
 
 admin.site.register(MapRelease, MapReleaseAdmin)
@@ -52,3 +85,5 @@ admin.site.register(MapFix, MapFixAdmin)
 admin.site.register(ServerType)
 admin.site.register(MapCategory, MapCategoryAdmin)
 admin.site.register(Map, MapAdmin)
+admin.site.register(ReleaseLog)
+admin.site.register(FixLog)
