@@ -209,8 +209,8 @@ class MapReleaseView(ProcessListView):
             logobj.log = str(self.log) + str(e)
             logobj.state = PROCESS.FAILED.value
         finally:
-            self.log = None
             logobj.save()
+            self.log = None
 
 
 class ReleaseLogView(PermissionRequiredMixin, View):
@@ -282,8 +282,8 @@ class MapFixView(ProcessListView):
             logobj.log = str(self.log) + str(e)
             logobj.state = PROCESS.FAILED.value
         finally:
-            self.log = None
             logobj.save()
+            self.log = None
 
 
 class FixLogView(PermissionRequiredMixin, View):
