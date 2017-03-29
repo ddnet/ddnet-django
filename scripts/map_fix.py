@@ -13,6 +13,9 @@ def fix():
             m = line.strip('\n')
             copyfile(m, os.path.join(tempdir, os.path.basename(m)))
 
+        # ensure tempdir is accessible
+        subprocess.call(['chmod', '-R', 'a+r', tempdir])
+
         p = subprocess.Popen(
             ['map_fix_final', tempdir],
             stdout=sys.stdout,

@@ -58,6 +58,7 @@ def release():
 
         # ensure tempdir is accessible
         subprocess.call(['chmod', '-R', 'a+r', tempdir])
+
         p = subprocess.Popen(
             ['map_release_final', tempdir],
             stdout=sys.stdout,
