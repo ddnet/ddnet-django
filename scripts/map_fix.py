@@ -22,6 +22,6 @@ def fix():
             stderr=sys.stderr
         )
 
-    return p.wait()
+        return p.wait()
 
 exit(fix())
