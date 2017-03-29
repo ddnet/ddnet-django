@@ -50,7 +50,7 @@ Release the following maps ?
     </div>
 </form>
 {% else %}
-<h2>Done.</h2>
+<h2>{% if process_failed %}Failed. {% else %}Done.{% endif %}</h2>
 <pre id="log">
 {{ log }}
 </pre>

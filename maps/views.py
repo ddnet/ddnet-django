@@ -3,6 +3,7 @@
 from threading import Thread
 import subprocess
 import json
+import datetime
 from queue import Queue
 from django.shortcuts import render
 from django.views.generic.detail import View
@@ -10,7 +11,6 @@ from django.views.generic.detail import TemplateResponseMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
-import datetime
 
 
 from .models import MapRelease, MapFix, ReleaseLog, FixLog, PROCESS
@@ -109,10 +109,12 @@ class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
         ctx['pending_objects'] = pending_objs
         ctx['objects'] = objs
         if not objs and not pending_objs:
-            ctx['log'] = self.get_last_log()
+            log = self.get_last_log()
+            ctx['log'] = log.log or ''
+            if log is not None:
+                ctx['process_failed'] = log.state == PROCESS.FAILED.value
         else:
             ctx['log'] = self.log
-        print(self.log)
         return render(request, self.template_name, ctx)
 
     def post(self, request, *args, **kwargs):
@@ -152,8 +154,7 @@ class MapReleaseView(ProcessListView):
 
     def get_last_log(self):
         '''Get latest releaselog.'''
-        obj = ReleaseLog.objects.latest('timestamp')
-        return obj and obj.log or ''
+        return ReleaseLog.objects.latest('timestamp')
 
     def target(self):
         '''Run the release process.'''
@@ -161,6 +162,13 @@ class MapReleaseView(ProcessListView):
         objects.update(release_date=datetime.datetime.now())
         logobj = ReleaseLog()
         try:
+            maps = []
+            # Create Map entries for the Maps table
+            for mr in objects:
+                m = mr.to_Map()
+                m.save()
+                maps.append(m)
+
             q = self.log.queue
             p = subprocess.Popen(
                 ['map_release'],
@@ -191,6 +199,12 @@ class MapReleaseView(ProcessListView):
             logobj.log = str(self.log)
             logobj.state = PROCESS.DONE.value
         except Exception as e:
+            # revert Mapreleases
+            for m in maps:
+                try:
+                    m.delete()
+                except Exception:
+                    pass
             self.update_state(objects, PROCESS.FAILED.value)
             logobj.log = str(self.log) + str(e)
             logobj.state = PROCESS.FAILED.value
@@ -236,8 +250,7 @@ class MapFixView(ProcessListView):
 
     def get_last_log(self):
         '''Return latest Fixlog.'''
-        obj = FixLog.objects.latest('timestamp')
-        return obj and obj.log or ''
+        return FixLog.objects.latest('timestamp')
 
     def target(self):
         '''Run the mapfix process.'''

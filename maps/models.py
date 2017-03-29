@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 import enum
+import datetime
 
 from ddnet_base.validtors import image_validator
 from ddnet_django.storage import get_valid_name
@@ -74,6 +75,16 @@ class MapRelease(models.Model):
     class Meta:
         permissions = (('can_release_map', 'Can release maps'),)
         ordering = ('name',)
+
+    def to_Map(self):
+        return Map(
+            name=self.name,
+            server_type=self.server_type,
+            categories=self.categories.all(),
+            mapper=self.mapper,
+            stars=self.stars,
+            timestamp=datetime.datetime.now()
+        )
 
     def __str__(self):
         return self.name
