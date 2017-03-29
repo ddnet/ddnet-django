@@ -57,6 +57,7 @@ def release():
                 return 3
 
         # ensure tempdir is accessible
+        subprocess.call(['chmod', 'a+x', tempdir])
         subprocess.call(['chmod', '-R', 'a+r', tempdir])
 
         p = subprocess.Popen(
