@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
 from maps.views import MapReleaseView, MapFixView
+from servers.views import BroadcastView
 
 
 class DDNetAdmin(admin.AdminSite):
@@ -15,7 +16,8 @@ class DDNetAdmin(admin.AdminSite):
 
         extra_urls = [
             url(r'^maps/maprelease/release', MapReleaseView.as_view(), name='map_release'),
-            url(r'^maps/mapfix/fix', MapFixView.as_view(), name='map_fix')
+            url(r'^maps/mapfix/fix', MapFixView.as_view(), name='map_fix'),
+            url(r'^servers/broadcast/broadcast', BroadcastView.as_view(), name='broadcast')
         ]
 
         return urls + extra_urls
@@ -24,6 +26,7 @@ class DDNetAdmin(admin.AdminSite):
 site = DDNetAdmin()
 MapReleaseView.admin = site
 MapFixView.admin = site
+BroadcastView.admin = site
 
 site.register(Group, GroupAdmin)
 site.register(User, UserAdmin)

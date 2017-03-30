@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{% load staticfiles %}
+{% if broadcasting %}
+    <script type="text/javascript" src="{% static "scripts/external/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "scripts/broadcast.js" %}"></script>
+    <script type="text/javascript">
+        var LOG_URL = "{% url 'servers:broadcast_log' %}"
+        var LOGEXISTS_URL = "{% url 'servers:broadcast_log' %}?broadcasting"
+            $(function () {
+                setTimeout(update_log, 500);
+            });
+    </script>
+{% endif %}
+<link rel="stylesheet" href="{% static "css/logupdate.css" %}"/>
+{% endblock %}
+
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+{# &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>#}
+&rsaquo; Broadcasts
+</div>
+{% endblock %}
+
+{% block content %}
+
+<form enctype="multipart/form-data" action="" method="post" id="broadcast_form" novalidate>
+    <div class="form-row field-name">
+        <div>
+            <label class="required" for="id_name">Broadcast:</label>
+            <input class="vTextField" id="id_name" maxlength="128" name="broadcast" type="text" required />
+        </div>
+    </div>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+    <div class="submit-row">
+        <input type="submit" value="Broadcast" class="default" name="_broadcast" />
+    </div>
+</form>
+
+{% if broadcasting %}
+<pre id="log"></pre>
+{% endif %}
+
+{% endblock %}

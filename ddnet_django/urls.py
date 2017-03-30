@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^admin/', site.urls),
     url(r'^skins/', include('skins.urls'), name='skins'),
     url(r'^maps/', include('maps.urls'), name='maps'),
+    url(r'^servers/', include('servers.urls'), name='servers'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + settings.EXTRA_URLS

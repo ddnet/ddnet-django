@@ -5,37 +5,15 @@ import subprocess
 import json
 import datetime
 from queue import Queue
-from django.shortcuts import render
 from django.views.generic.detail import View
 from django.views.generic.detail import TemplateResponseMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 
+from ddnet_base.utils import Log
 
 from .models import MapRelease, MapFix, ReleaseLog, FixLog, PROCESS
-
-
-class Log:
-    '''Class to allow non blocking reading from a log being generated.'''
-
-    def __init__(self, q):
-        '''Init with a queue where the log is going to be written.'''
-        self._queue = q
-        self._log = ''
-
-    def __str__(self):
-        '''Take everything from the queue and store it within this object and return full log.'''
-        s = ''
-        while not self._queue.empty():
-            s += self._queue.get_nowait()
-        self._log += s
-        return self._log
-
-    @property
-    def queue(self):
-        '''The Queue this object is operating on.'''
-        return self._queue
 
 
 # Global Logs
