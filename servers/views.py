@@ -49,13 +49,10 @@ class BroadcastView(PermissionRequiredMixin, TemplateView):
 
         try:
             p = subprocess.Popen(
-                ['ddnet_broadcast'],
-                stdin=subprocess.PIPE,
+                ['ddnet_broadcast', bc],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT
             )
-            p.stdin.write(bytes(bc, encoding='utf-8'))
-            p.stdin.close()
             for line in iter(p.stdout.readline, b''):
                 q.put(line.decode('utf-8'))
             p.stdout.close()
