@@ -14,6 +14,7 @@
     </script>
 {% endif %}
 <link rel="stylesheet" href="{% static "css/logupdate.css" %}"/>
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
 {% endblock %}
 
 {% load i18n admin_urls %}
@@ -32,7 +33,7 @@
     <div class="form-row field-name">
         <div>
             <label class="required" for="id_name">Broadcast:</label>
-            <input class="vTextField" id="id_name" maxlength="128" name="broadcast" type="text" required />
+            <input class="vLargeTextField" id="id_name" maxlength="128" name="broadcast" type="text" required />
         </div>
     </div>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
