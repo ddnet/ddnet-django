@@ -8,7 +8,7 @@ from django.http import HttpResponse, Http404
 
 from ddnet_base.utils import Log
 
-from .models import DummyPermissionModel
+from .models import Broadcast
 
 BLOG = None
 BROADCASTING = 0
@@ -17,12 +17,13 @@ class BroadcastView(PermissionRequiredMixin, TemplateView):
     template_name = 'admin/servers/broadcast/broadcast.html'
     permission_required = 'maps.can_broadcast'
     admin = None
+    model = Broadcast
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx.update({
-            'opts': DummyPermissionModel._meta, # NOQA
-            'app_label': DummyPermissionModel._meta.app_label, # NOQA
+            'opts': self.model._meta, # NOQA
+            'app_label': self.model._meta.app_label, # NOQA
         })
         ctx.update(self.admin.each_context(self.request))
         return ctx

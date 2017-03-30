@@ -17,7 +17,6 @@ class DDNetAdmin(admin.AdminSite):
         extra_urls = [
             url(r'^maps/maprelease/release', MapReleaseView.as_view(), name='map_release'),
             url(r'^maps/mapfix/fix', MapFixView.as_view(), name='map_fix'),
-            url(r'^servers/broadcast/broadcast', BroadcastView.as_view(), name='broadcast')
         ]
 
         return urls + extra_urls

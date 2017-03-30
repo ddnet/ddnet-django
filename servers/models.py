@@ -1,7 +1,8 @@
 from django.db import models
 
 
-class DummyPermissionModel(models.Model):
+# Pretty much a dummy right now
+class Broadcast(models.Model):
 
     class Meta:
         managed = False
