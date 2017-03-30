@@ -2,9 +2,11 @@ from django.contrib.admin import ModelAdmin
 from django.http import HttpResponseRedirect
 from django.contrib import admin as dj_admin
 from django.urls import reverse
+from django.conf.urls import url
 
 from ddnet_django import admin
 from .models import MapRelease, ServerType, Map, MapCategory, MapFix, ReleaseLog, FixLog, PROCESS
+from .views import MapReleaseView, MapFixView
 
 
 class MapAdmin(ModelAdmin):
@@ -56,6 +58,11 @@ class MapReleaseAdmin(ModelAdmin):
 
     actions = [release_action]
 
+    def get_urls(self):
+        return super().get_urls() + [
+            url(r'^release', MapReleaseView.as_view(), name='map_release'),
+        ]
+
 
 def fix_action(modeladmin, request, queryset):
     selected = request.POST.getlist(dj_admin.ACTION_CHECKBOX_NAME)
@@ -71,13 +78,17 @@ class MapFixAdmin(ModelAdmin):
         'state',
         'timestamp'
     )
+    actions = [fix_action]
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None and obj.state == PROCESS.PENDING.value:
             return super().get_fields(request)
         return super().get_readonly_fields(request)
 
-    actions = [fix_action]
+    def get_urls(self):
+        return super().get_urls() + [
+            url(r'^fix', MapFixView.as_view(), name='map_fix'),
+        ]
 
 
 admin.site.register(MapRelease, MapReleaseAdmin)
