@@ -67,7 +67,7 @@ class MapRelease(models.Model):
 
     stars = models.IntegerField(default=0, choices=STARS)
 
-    release_date = models.DateTimeField()
+    release_date = models.DateTimeField(blank=True)
     state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
