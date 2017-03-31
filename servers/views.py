@@ -15,7 +15,7 @@ BROADCASTING = 0
 
 class BroadcastView(PermissionRequiredMixin, TemplateView):
     template_name = 'admin/servers/broadcast/broadcast.html'
-    permission_required = 'maps.can_broadcast'
+    permission_required = 'servers.can_broadcast'
     admin = None
     model = Broadcast
 
