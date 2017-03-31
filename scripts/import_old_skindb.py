@@ -7,6 +7,7 @@ Basically it parses some html and downloads all skins.
 '''
 
 import os
+import sys
 
 from datetime import datetime
 
