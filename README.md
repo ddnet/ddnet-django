@@ -64,7 +64,8 @@ DATABASES = {
 ```
 5. Navigate back to the root directory `ddnet-django/`
 4. `python manage.py makemigrations` will create a db-scpecific script to upgrade your database
-5. `python manage.py migrate` will upgrade your database with the most up-to-date changes
+5. `python manage.py migrate` will upgrade your database with the most up-to-date changes; also run `python manage.py migrate skins --database=skins_db` and `python manage.py migrate maps --database=ddnet_db` in order to create the tables required for those apps.
+Please note that the table record_maps in the maps database is assumend to be already there, django will not touch it.
 6. `python manage.py runserver [host:port]` will start the application on a default [http://127.0.0.1:8000/](http://127.0.0.1:8000/) server or [http://host:port/](http://host:port/) if you specify the optional parameters
 7. `python manage.py createsuperuser --username=username --email=email@email.com` will generate admin account
 
