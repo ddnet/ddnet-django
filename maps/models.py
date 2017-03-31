@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 import enum
 import datetime
 
-from ddnet_base.validtors import image_validator
+from ddnet_base.validators import image_validator
 from ddnet_django.storage import get_valid_name
 
 from .fields import MapFileField, MapImageField

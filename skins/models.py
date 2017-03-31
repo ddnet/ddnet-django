@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.db import models
 
-from ddnet_base.validtors import image_validator
+from ddnet_base.validators import image_validator
 
 
 class Skin(models.Model):
