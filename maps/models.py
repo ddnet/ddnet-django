@@ -67,7 +67,7 @@ class MapRelease(models.Model):
 
     stars = models.IntegerField(default=0, choices=STARS)
 
-    release_date = models.DateTimeField(blank=True)
+    timestamp = models.DateTimeField(blank=True, auto_now_add=True)
     state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
@@ -120,7 +120,7 @@ class MapFix(models.Model):
     state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
-    timestamp = models.DateTimeField(blank=True)
+    timestamp = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         ordering = ('mapfile',)

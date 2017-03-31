@@ -50,13 +50,16 @@ class MapReleaseAdmin(ModelAdmin):
     list_display = (
         'name',
         'state',
-        'release_date'
+        'timestamp'
     )
     list_filter = ('state',)
+    readonly_fields = (
+        'timestamp',
+    )
 
     def get_readonly_fields(self, request, obj=None):
-        # if obj is not None and obj.state == PROCESS.PENDING.value:
-        #     return super().get_fields(request)
+        if obj is not None and obj.state == PROCESS.PENDING.value:
+            return super().get_fields(request)
         return super().get_readonly_fields(request)
 
     actions = [release_action]
@@ -81,6 +84,9 @@ class MapFixAdmin(ModelAdmin):
         'state',
         'timestamp'
     )
+    readonly_fields = (
+        'timestamp',
+    )
     actions = [fix_action]
 
     def get_readonly_fields(self, request, obj=None):
@@ -99,6 +105,11 @@ class ScheduledMapReleaseAdmin(ModelAdmin):
         'release_date',
         'state'
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj is not None and obj.state == PROCESS.PENDING.value:
+            return super().get_fields(request)
+        return super().get_readonly_fields(request)
 
 
 class ReleaseLogAdmin(ModelAdmin):

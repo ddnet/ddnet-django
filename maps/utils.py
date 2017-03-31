@@ -2,7 +2,9 @@ import json
 import time
 import subprocess
 from threading import Thread
+from datetime import timedelta
 
+from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Lower
 from django.core.exceptions import ObjectDoesNotExist
@@ -84,7 +86,7 @@ def release_maps_thread(on_finished=None):
     global RLOG
     '''Run the release process.'''
     objects = MapRelease.objects.filter(state=PROCESS.PENDING.value)
-    objects.update(release_date=timezone.now())
+    objects.update(timestamp=timezone.now())
     logobj = ReleaseLog()
     try:
         maps = []
@@ -218,11 +220,9 @@ def handle_scheduled_releases():
             else:
                 release.state = PROCESS.PENDING.value
                 release.save()
-
+                pk = release.pk
                 def on_finished(state):
-                    release = ScheduledMapRelease.objects.filter(
-                        state=PROCESS.PENDING.value
-                    ).latest('release_date')
+                    release = ScheduledMapRelease.objects.get(pk=pk)
                     release.state = state
                     release.save()
                     if state == PROCESS.DONE.value:
@@ -246,3 +246,33 @@ def handle_scheduled_releases():
                 sleep_time = 0
 
         time.sleep(sleep_time)
+
+
+def handle_cleanup():
+    while True:
+        days = 3
+        days_ago = timezone.now() - timedelta(days=days)
+
+        # delete everything older than three days except its state is pending or not started
+        MapRelease.objects.filter(
+            Q(timestamp__lte=days_ago) & ~Q(state=PROCESS.PENDING.value)
+        ).delete()
+        MapFix.objects.filter(
+            Q(timestamp__lte=days_ago) &
+            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+        ).delete()
+        ReleaseLog.objects.filter(
+            Q(timestamp__lte=days_ago) &
+            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+        ).delete()
+        FixLog.objects.filter(
+            Q(timestamp__lte=days_ago) &
+            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+        ).delete()
+        ScheduledMapRelease.objects.filter(
+            Q(release_date__lte=days_ago) &
+            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+        ).delete()
+
+        # every six hours should be more than sufficient
+        time.sleep(60*60*6)
