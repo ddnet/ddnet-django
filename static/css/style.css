@@ -6,9 +6,14 @@
 }
 */
 
+@font-face { font-family: OpenSans; src: url('../fonts/OpenSans-Regular.ttf'); } 
+@font-face { font-family: OpenSans; font-weight: bold; src: url('../fonts/OpenSans-Bold.ttf');}
+@font-face { font-family: OpenSans; font-weight: normal; font-style: italic; src: url('../fonts/OpenSans-Italic.ttf');}
+@font-face { font-family: OpenSans; font-weight: bold; font-style: italic; src: url('../fonts/OpenSans-BoldItalic.ttf');}
+
 html, body {
     background-color: #d8efff;
-    font-family: sans-serif;
+    font-family: OpenSans, sans-serif;
     margin: 0;
     padding: 0;
     font-size: 100%;
