@@ -5,7 +5,10 @@ from django.urls import reverse
 from django.conf.urls import url
 
 from ddnet_django import admin
-from .models import MapRelease, ServerType, Map, MapCategory, MapFix, ReleaseLog, FixLog, PROCESS
+from .models import (
+    MapRelease, ServerType, Map, MapCategory, MapFix, ReleaseLog, FixLog, ScheduledMapRelease,
+    PROCESS
+)
 from .views import MapReleaseView, MapFixView
 
 
@@ -91,10 +94,31 @@ class MapFixAdmin(ModelAdmin):
         ]
 
 
+class ScheduledMapReleaseAdmin(ModelAdmin):
+    list_display = (
+        'release_date',
+        'state'
+    )
+
+
+class ReleaseLogAdmin(ModelAdmin):
+    list_display = (
+        'timestamp',
+        'state'
+    )
+
+class FixLogAdmin(ModelAdmin):
+    list_display = (
+        'timestamp',
+        'state'
+    )
+
+
 admin.site.register(MapRelease, MapReleaseAdmin)
 admin.site.register(MapFix, MapFixAdmin)
 admin.site.register(ServerType)
 admin.site.register(MapCategory, MapCategoryAdmin)
 admin.site.register(Map, MapAdmin)
-admin.site.register(ReleaseLog)
-admin.site.register(FixLog)
+admin.site.register(ReleaseLog, ReleaseLogAdmin)
+admin.site.register(FixLog, FixLogAdmin)
+admin.site.register(ScheduledMapRelease, ScheduledMapReleaseAdmin)

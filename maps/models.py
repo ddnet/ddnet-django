@@ -141,7 +141,7 @@ class ReleaseLog(models.Model):
     )
 
     class Meta:
-        ordering = ('timestamp',)
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return str(self.timestamp)
@@ -155,7 +155,22 @@ class FixLog(models.Model):
     )
 
     class Meta:
-        ordering = ('timestamp',)
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return str(self.timestamp)
+
+
+class ScheduledMapRelease(models.Model):
+    release_date = models.DateTimeField()
+    maps = models.ManyToManyField(to=MapRelease)
+    broadcast = models.CharField(max_length=128, blank=True)
+    state = models.IntegerField(
+        default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
+    )
+
+    class Meta:
+        ordering = ('release_date',)
+
+    def __str__(self):
+        return str(self.release_date)

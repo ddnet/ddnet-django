@@ -1,13 +1,11 @@
 '''Views for the maps app.'''
 
-import subprocess
-import json
-import datetime
 from django.views.generic.detail import View
 from django.views.generic.detail import TemplateResponseMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import MapRelease, MapFix, ReleaseLog, FixLog, PROCESS
 from .utils import release_maps, fix_maps, current_fix_log, current_release_log
@@ -69,7 +67,7 @@ class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
         ctx['objects'] = objs
         if not objs and not pending_objs:
             log = self.get_last_log()
-            ctx['log'] = log.log or ''
+            ctx['log'] = log and log.log or ''
             if log is not None:
                 ctx['process_failed'] = log.state == PROCESS.FAILED.value
         else:
@@ -102,7 +100,10 @@ class MapReleaseView(ProcessListView):
 
     def get_last_log(self):
         '''Get latest releaselog.'''
-        return ReleaseLog.objects.latest('timestamp')
+        try:
+            return ReleaseLog.objects.latest('timestamp')
+        except ObjectDoesNotExist:
+            return None
 
     def run(self, objects):
         '''Run the release process.'''
@@ -141,7 +142,10 @@ class MapFixView(ProcessListView):
 
     def get_last_log(self):
         '''Return latest Fixlog.'''
-        return FixLog.objects.latest('timestamp')
+        try:
+            return FixLog.objects.latest('timestamp')
+        except ObjectDoesNotExist:
+            return None
 
     def run(self, objects):
         '''Run the fix process.'''

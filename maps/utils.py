@@ -1,13 +1,17 @@
 import json
+import time
 import subprocess
 from threading import Thread
 
 from django.utils import timezone
 from django.db.models.functions import Lower
+from django.core.exceptions import ObjectDoesNotExist
 
 from ddnet_base.utils import Log
 
-from .models import Map, MapCategory, MapRelease, ReleaseLog, MapFix, FixLog, PROCESS
+from .models import (
+    Map, MapCategory, MapRelease, ReleaseLog, MapFix, FixLog, ScheduledMapRelease, PROCESS
+)
 
 
 # Global Logs
@@ -76,7 +80,7 @@ def print_mapfile(server_type):
     print_categories(categories, server_type, maps_set)
 
 
-def release_maps_thread():
+def release_maps_thread(on_finished=None):
     global RLOG
     '''Run the release process.'''
     objects = MapRelease.objects.filter(state=PROCESS.PENDING.value)
@@ -132,16 +136,20 @@ def release_maps_thread():
     finally:
         logobj.save()
         RLOG = None
+        if on_finished:
+            on_finished(logobj.state)
 
 
-def release_maps(mapreleases):
+def release_maps(mapreleases, on_finished=None):
     global RLOG
     if mapreleases and not MapRelease.objects.filter(state=PROCESS.PENDING.value):
         RLOG = Log()
         mapreleases.update(state=PROCESS.PENDING.value)
-        t = Thread(target=release_maps_thread)
+        t = Thread(target=release_maps_thread, args=(on_finished,))
         t.daemon = True
         t.start()
+    elif on_finished:
+        on_finished(PROCESS.FAILED.value)
 
 
 def fix_maps_thread():
@@ -187,3 +195,54 @@ def fix_maps(mapfixes):
         t = Thread(target=fix_maps_thread)
         t.daemon = True
         t.start()
+
+
+def handle_scheduled_releases():
+    while True:
+        sleep_time = 60
+        try:
+            release = ScheduledMapRelease.objects.filter(
+                state=PROCESS.NOT_STARTED.value
+            ).latest('release_date')
+        except ObjectDoesNotExist:
+            time.sleep(sleep_time)
+            continue
+
+        pending = False
+
+        # time is up...
+        if release.release_date < timezone.now():
+            # ...and no release pending ?
+            if MapRelease.objects.filter(state=PROCESS.PENDING.value):
+                pending = True
+            else:
+                release.state = PROCESS.PENDING.value
+                release.save()
+
+                def on_finished(state):
+                    release = ScheduledMapRelease.objects.filter(
+                        state=PROCESS.PENDING.value
+                    ).latest('release_date')
+                    release.state = state
+                    release.save()
+                    if state == PROCESS.DONE.value:
+                        if release.broadcast:
+                            try:
+                                subprocess.Popen(
+                                    ['ddnet_broadcast', release.broadcast],
+                                    stdout=subprocess.DEVNULL
+                                ).wait(timeout=31)
+                            except subprocess.TimeoutExpired:
+                                pass
+
+                release_maps(
+                    release.maps.filter(state=PROCESS.NOT_STARTED.value),
+                    on_finished=on_finished
+                )
+        # try to be precise
+        elif not pending and (release.release_date - timezone.now()).total_seconds() < sleep_time:
+            sleep_time = (release.release_date - timezone.now()).total_seconds() + 1
+            if sleep_time < 0:
+                sleep_time = 0
+
+        time.sleep(sleep_time)
