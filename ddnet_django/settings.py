@@ -136,6 +136,8 @@ EXTRA_URLS = []
 
 # You might want to put this in there:
 
+# from .settings import *
+
 # DEBUG = True
 
 # ALLOWED_HOSTS = []
@@ -168,7 +170,7 @@ EXTRA_URLS = []
 #     },
 #
 #     # this is the db to use for the maps app
-#     'maps_db': {
+#     'ddnet_db': {
 #         'ENGINE': '',
 #         'NAME': '',
 #         'USER': '',
@@ -177,3 +179,8 @@ EXTRA_URLS = []
 #         'PORT': '',
 #     },
 # }
+#
+# In case you use mysql or mariadb:
+#
+# import pymysql
+# pymysql.install_as_MySQLdb()

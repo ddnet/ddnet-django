@@ -6,28 +6,61 @@
 ## Installation
 
 1. Install [`Python 3.X`](https://www.python.org/downloads/)
-2. Navigate to the root directory (`ddnet-django/`) and run: `pip install -r requirements.txt` - it will install the newest Django 
+2. Navigate to the root directory (`ddnet-django/`) and run: `pip install -r requirements.txt` - it will install the newest Django
 version and all required python libraries
 3. Navigate to `ddnet-django/ddnet_django/`
-4. Create `settings_private.py` file and fill there the following database configuration - replace values between `<` `>` with your individual settings
+4. Create `settings_private.py` file and fill there the following configuration with your individual settings
 
 ```python
-DEBUG = True
+from .settings import *
+
+# DEBUG = True
+
 ALLOWED_HOSTS = []
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$$$django%ddnet%secret123123!!'
+
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+
 DATABASES = {
+    # this is where django-internal stuff goes
     'default': {
-        'ENGINE': '<django.db.backends.postgresql>',
-        'NAME': '<ddnet_db>',
-        'USER': '<postgres>',
-        'PASSWORD': '<postgres>',
-        'HOST': '<localhost>',
-        'PORT': '<5432>',
-    }
+        'ENGINE': '',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
+
+    # this is the db to use for the skins app
+    'skins_db': {
+        'ENGINE': '',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
+
+    # this is the db to use for the maps app
+    'ddnet_db': {
+        'ENGINE': '',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
 }
+
+# In case you use mysql or mariadb:
+# You will need to install pymysql first.
+#
+# import pymysql
+# pymysql.install_as_MySQLdb()
 ```
 5. Navigate back to the root directory `ddnet-django/`
 4. `python manage.py makemigrations` will create a db-scpecific script to upgrade your database
