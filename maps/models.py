@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 import enum
-import datetime
+from django.utils import timezone
 
 from ddnet_base.validators import image_validator
 from ddnet_django.storage import get_valid_name
@@ -83,7 +83,7 @@ class MapRelease(models.Model):
             categories=self.categories.all(),
             mapper=self.mapper,
             stars=self.stars,
-            timestamp=datetime.datetime.now()
+            timestamp=timezone.now()
         )
 
     def __str__(self):

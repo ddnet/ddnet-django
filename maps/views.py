@@ -1,26 +1,16 @@
 '''Views for the maps app.'''
 
-from threading import Thread
 import subprocess
 import json
 import datetime
-from queue import Queue
 from django.views.generic.detail import View
 from django.views.generic.detail import TemplateResponseMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
 
-from ddnet_base.utils import Log
-
 from .models import MapRelease, MapFix, ReleaseLog, FixLog, PROCESS
-
-
-# Global Logs
-# For Releases:
-RLOG = None
-# For Fixes:
-FLOG = None
+from .utils import release_maps, fix_maps, current_fix_log, current_release_log
 
 
 class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
@@ -28,17 +18,12 @@ class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
 
     admin = None
 
-    @property
-    def log(self):
-        '''Log to write to.'''
+    def get_current_log(self):
+        '''Current log.'''
         raise NotImplementedError()
 
-    @log.setter
-    def log(self, val):
-        raise NotImplementedError()
-
-    def target(self):
-        '''Thread to be executed.'''
+    def run(self, objects):
+        '''Method that will invoke the process.'''
         raise NotImplementedError()
 
     def get_last_log(self):
@@ -52,10 +37,6 @@ class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
         except ValueError:
             ids = set()
         return ids
-
-    def update_state(self, objects, state):
-        '''Set objects state.'''
-        objects.update(state=state)
 
     def get_pending(self):
         '''Return a list of objects currently being processed.'''
@@ -92,18 +73,13 @@ class ProcessListView(PermissionRequiredMixin, TemplateResponseMixin, View):
             if log is not None:
                 ctx['process_failed'] = log.state == PROCESS.FAILED.value
         else:
-            ctx['log'] = self.log
+            ctx['log'] = self.get_current_log()
         return render(request, self.template_name, ctx)
 
     def post(self, request, *args, **kwargs):
         '''Trigger the external process if possible.'''
         objects = self.get_objects(self.get_ids(request.POST.get('ids', '')))
-        if objects and not self.get_pending():
-            self.log = Log(Queue())
-            self.update_state(objects, PROCESS.PENDING.value)
-            t = Thread(target=self.target)
-            t.daemon = True
-            t.start()
+        self.run(objects)
 
         return redirect(request.path)
 
@@ -120,75 +96,17 @@ class MapReleaseView(ProcessListView):
         '''Return iterable of pending mapreleases.'''
         return self.model.objects.filter(state=PROCESS.PENDING.value)
 
-    @property
-    def log(self):
+    def get_current_log(self):
         '''ReleaseLog.'''
-        return RLOG
-
-    @log.setter
-    def log(self, val):
-        global RLOG # NOQA - yes there should be only this log
-        RLOG = val
+        return current_release_log() or ''
 
     def get_last_log(self):
         '''Get latest releaselog.'''
         return ReleaseLog.objects.latest('timestamp')
 
-    def target(self):
+    def run(self, objects):
         '''Run the release process.'''
-        objects = self.get_pending()
-        objects.update(release_date=datetime.datetime.now())
-        logobj = ReleaseLog()
-        try:
-            maps = []
-            # Create Map entries for the Maps table
-            for mr in objects:
-                m = mr.to_Map()
-                m.save()
-                maps.append(m)
-
-            q = self.log.queue
-            p = subprocess.Popen(
-                ['map_release'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-            p.stdin.write(bytes(json.dumps(
-                {
-                    m.name:
-                        {
-                            'map': m.mapfile.path,
-                            'image': m.img.path,
-                            'mapper': m.mapper,
-                            'server_type': m.server_type.name
-                        } for m in objects
-                }
-            ), encoding='utf-8'))
-            p.stdin.close()
-            for line in iter(p.stdout.readline, b''):
-                q.put(line.decode('utf-8'))
-            p.stdout.close()
-            returncode = p.wait()
-            if returncode != 0:
-                raise RuntimeError('Subprocess terminated with errors.')
-
-            self.update_state(objects, PROCESS.DONE.value)
-            logobj.log = str(self.log)
-            logobj.state = PROCESS.DONE.value
-        except Exception as e:
-            # revert Mapreleases
-            for m in maps:
-                try:
-                    m.delete()
-                except Exception:
-                    pass
-            self.update_state(objects, PROCESS.FAILED.value)
-            logobj.log = str(self.log) + str(e)
-            logobj.state = PROCESS.FAILED.value
-        finally:
-            logobj.save()
-            self.log = None
+        release_maps(objects)
 
 
 class ReleaseLogView(PermissionRequiredMixin, View):
@@ -198,8 +116,9 @@ class ReleaseLogView(PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         '''Return plaintext releaselog if it exists otherwise 404.'''
-        if RLOG is not None:
-            return HttpResponse(str(RLOG))
+
+        if current_release_log() is not None:
+            return HttpResponse(str(current_release_log()))
         else:
             raise Http404
 
@@ -216,52 +135,17 @@ class MapFixView(ProcessListView):
         '''Return iterable of pending mapfixes.'''
         return self.model.objects.filter(state=PROCESS.PENDING.value)
 
-    @property
-    def log(self):
-        '''Return mapfixlog.'''
-        return FLOG
-
-    @log.setter
-    def log(self, val):
-        global FLOG # NOQA
-        FLOG = val
+    def get_current_log(self):
+        '''FixLog.'''
+        return current_fix_log() or ''
 
     def get_last_log(self):
         '''Return latest Fixlog.'''
         return FixLog.objects.latest('timestamp')
 
-    def target(self):
-        '''Run the mapfix process.'''
-        objects = self.get_pending()
-        objects.update(timestamp=datetime.datetime.now())
-        logobj = FixLog()
-        try:
-            q = self.log.queue
-            p = subprocess.Popen(
-                ['map_fix'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT
-            )
-            p.stdin.write(bytes('\n'.join(m.mapfile.path for m in objects), encoding='utf-8'))
-            p.stdin.close()
-            for line in iter(p.stdout.readline, b''):
-                q.put(line.decode('utf-8'))
-            p.stdout.close()
-            returncode = p.wait()
-            if returncode != 0:
-                raise RuntimeError('Subprocess terminated with errors.')
-
-            self.update_state(objects, PROCESS.DONE.value)
-            logobj.log = str(self.log)
-            logobj.state = PROCESS.DONE.value
-        except Exception as e:
-            self.update_state(objects, PROCESS.FAILED.value)
-            logobj.log = str(self.log) + str(e)
-            logobj.state = PROCESS.FAILED.value
-        finally:
-            logobj.save()
-            self.log = None
+    def run(self, objects):
+        '''Run the fix process.'''
+        fix_maps(objects)
 
 
 class FixLogView(PermissionRequiredMixin, View):
@@ -271,7 +155,8 @@ class FixLogView(PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         '''Return plaintext fixlog if it exists otherwise 404.'''
-        if FLOG is not None:
-            return HttpResponse(str(FLOG))
+
+        if current_fix_log() is not None:
+            return HttpResponse(str(current_fix_log()))
         else:
             raise Http404
