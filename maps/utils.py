@@ -143,11 +143,13 @@ def release_maps_thread(on_finished=None):
         RLOG = None
         if on_finished:
             on_finished(logobj.state)
+        logger.info('Maprelease done')
 
 
 def release_maps(mapreleases, on_finished=None):
     global RLOG
     if mapreleases and not MapRelease.objects.filter(state=PROCESS.PENDING.value):
+        logger.info('Starting maprelease')
         RLOG = Log()
         mapreleases.update(state=PROCESS.PENDING.value)
         t = Thread(target=release_maps_thread, args=(on_finished,))
@@ -190,11 +192,13 @@ def fix_maps_thread():
     finally:
         logobj.save()
         FLOG = None
+        logger.info('Mapfix done')
 
 
 def fix_maps(mapfixes):
     global FLOG
     if mapfixes and not MapFix.objects.filter(state=PROCESS.PENDING.value):
+        logger.info('Starting mapfix')
         FLOG = Log()
         mapfixes.update(state=PROCESS.PENDING.value)
         t = Thread(target=fix_maps_thread)
@@ -242,7 +246,7 @@ def handle_scheduled_releases():
                                     stdout=subprocess.DEVNULL
                                 ).wait(timeout=31)
                             except subprocess.TimeoutExpired:
-                                pass
+                                logger.warning('Scheduled Release: Broadcast failed.')
 
                 release_maps(
                     release.maps.filter(state=PROCESS.NOT_STARTED.value),

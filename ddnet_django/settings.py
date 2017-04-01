@@ -93,9 +93,22 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(name)s::%(funcName)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
+        'console_verbose': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
     },
     'loggers': {
@@ -104,7 +117,7 @@ LOGGING = {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         'maps': {
-            'handlers': ['console'],
+            'handlers': ['console_verbose'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
