@@ -130,7 +130,7 @@ class MapFixView(ProcessListView):
     model = MapFix
     template_name = 'admin/maps/mapfix/fix_form.html'
     admin = None
-    permission_required = 'maps.can_release_map'
+    permission_required = 'maps.can_fix_map'
 
     def get_pending(self):
         '''Return iterable of pending mapfixes.'''
@@ -155,7 +155,7 @@ class MapFixView(ProcessListView):
 class FixLogView(PermissionRequiredMixin, View):
     '''View for fixlog.'''
 
-    permission_required = 'maps.can_release_map'
+    permission_required = 'maps.can_fix_map'
 
     def get(self, request, *args, **kwargs):
         '''Return plaintext fixlog if it exists otherwise 404.'''

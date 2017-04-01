@@ -124,6 +124,7 @@ class MapFix(models.Model):
 
     class Meta:
         ordering = ('mapfile',)
+        permissions = (('can_fix_map', 'Can fix maps'),)
 
     @property
     def name(self):
