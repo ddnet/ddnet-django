@@ -26,6 +26,7 @@ DEBUG = False
 # Application definition
 
 INSTALLED_APPS = [
+    'ddnet.apps.DDNetConfig',
     'maps.apps.MapsConfig',
     'skins.apps.SkinsConfig',
     'servers.apps.ServersConfig',
@@ -63,7 +64,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
             'builtins': [
-                'ddnet_base.templatetags.tags',
+                'ddnet.templatetags.tags',
             ],
         },
     },

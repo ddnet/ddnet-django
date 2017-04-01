@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.db.models.functions import Lower
 from django.core.exceptions import ObjectDoesNotExist
 
-from ddnet_base.utils import Log, log_exception
+from ddnet.utils import Log, log_exception
 
 from .models import (
     Map, MapCategory, MapRelease, ReleaseLog, MapFix, FixLog, ScheduledMapRelease, PROCESS
@@ -209,7 +209,7 @@ def fix_maps(mapfixes):
 @log_exception(
     lambda e: logger.exception('An Exception occured in handle_scheduled_releases'),
     Exception,
-    retry_seconds=10
+    retry_seconds=30
 )
 def handle_scheduled_releases():
     while True:
@@ -264,7 +264,7 @@ def handle_scheduled_releases():
 @log_exception(
     lambda e: logger.exception('An Exception occured in handle_cleanup'),
     Exception,
-    retry_seconds=10
+    retry_seconds=30
 )
 def handle_cleanup():
     while True:

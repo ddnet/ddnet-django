@@ -58,9 +58,10 @@ class MapReleaseAdmin(ModelAdmin):
     )
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is not None and obj.state == PROCESS.PENDING.value:
-            return super().get_fields(request)
-        return super().get_readonly_fields(request)
+        if request.user.is_superuser:
+            return super().get_readonly_fields(request)
+
+        return super().get_readonly_fields(request) + ('state',)
 
     actions = [release_action]
 
@@ -90,9 +91,10 @@ class MapFixAdmin(ModelAdmin):
     actions = [fix_action]
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is not None and obj.state == PROCESS.PENDING.value:
-            return super().get_fields(request)
-        return super().get_readonly_fields(request)
+        if request.user.is_superuser:
+            return super().get_readonly_fields(request, obj)
+
+        return super().get_readonly_fields(request, obj) + ('state',)
 
     def get_urls(self):
         return super().get_urls() + [
@@ -107,9 +109,10 @@ class ScheduledMapReleaseAdmin(ModelAdmin):
     )
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is not None and obj.state == PROCESS.PENDING.value:
-            return super().get_fields(request)
-        return super().get_readonly_fields(request)
+        if request.user.is_superuser:
+            return super().get_readonly_fields(request, obj)
+
+        return super().get_readonly_fields(request, obj) + ('state',)
 
 
 class ReleaseLogAdmin(ModelAdmin):

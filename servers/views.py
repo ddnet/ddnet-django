@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
-from ddnet_base.utils import Log
+from ddnet.utils import Log
 
 from .models import Broadcast
 

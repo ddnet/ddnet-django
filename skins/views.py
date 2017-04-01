@@ -4,8 +4,8 @@ import zipfile
 
 from django.http import HttpResponse
 
-from ddnet_base.session_attributes import SessionAttribute, SessionAttributeUtil
-from ddnet_base.views import DDListView
+from ddnet.session_attributes import SessionAttribute, SessionAttributeUtil
+from ddnet.views import DDListView
 from ddnet_django.settings import MEDIA_ROOT, MEDIA_URL
 from .models import Skin
 
