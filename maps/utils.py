@@ -1,5 +1,6 @@
 import json
 import time
+import logging
 import subprocess
 from threading import Thread
 from datetime import timedelta
@@ -9,12 +10,14 @@ from django.utils import timezone
 from django.db.models.functions import Lower
 from django.core.exceptions import ObjectDoesNotExist
 
-from ddnet_base.utils import Log
+from ddnet_base.utils import Log, log_exception
 
 from .models import (
     Map, MapCategory, MapRelease, ReleaseLog, MapFix, FixLog, ScheduledMapRelease, PROCESS
 )
 
+
+logger = logging.getLogger(__name__)
 
 # Global Logs
 # For Releases:
@@ -199,6 +202,11 @@ def fix_maps(mapfixes):
         t.start()
 
 
+@log_exception(
+    lambda e: logger.exception('An Exception occured in handle_scheduled_releases'),
+    Exception,
+    retry_seconds=10
+)
 def handle_scheduled_releases():
     while True:
         sleep_time = 60
@@ -221,6 +229,7 @@ def handle_scheduled_releases():
                 release.state = PROCESS.PENDING.value
                 release.save()
                 pk = release.pk
+
                 def on_finished(state):
                     release = ScheduledMapRelease.objects.get(pk=pk)
                     release.state = state
@@ -248,31 +257,44 @@ def handle_scheduled_releases():
         time.sleep(sleep_time)
 
 
+@log_exception(
+    lambda e: logger.exception('An Exception occured in handle_cleanup'),
+    Exception,
+    retry_seconds=10
+)
 def handle_cleanup():
     while True:
         days = 3
         days_ago = timezone.now() - timedelta(days=days)
 
         # delete everything older than three days except its state is pending or not started
-        MapRelease.objects.filter(
-            Q(timestamp__lte=days_ago) & ~Q(state=PROCESS.PENDING.value)
-        ).delete()
-        MapFix.objects.filter(
-            Q(timestamp__lte=days_ago) &
-            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
-        ).delete()
-        ReleaseLog.objects.filter(
-            Q(timestamp__lte=days_ago) &
-            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
-        ).delete()
-        FixLog.objects.filter(
-            Q(timestamp__lte=days_ago) &
-            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
-        ).delete()
-        ScheduledMapRelease.objects.filter(
-            Q(release_date__lte=days_ago) &
-            ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
-        ).delete()
+        querysets = [
+            MapRelease.objects.filter(
+                Q(timestamp__lte=days_ago) &
+                ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+            ),
+            MapFix.objects.filter(
+                Q(timestamp__lte=days_ago) &
+                ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+            ),
+            ReleaseLog.objects.filter(
+                Q(timestamp__lte=days_ago) &
+                ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+            ),
+            FixLog.objects.filter(
+                Q(timestamp__lte=days_ago) &
+                ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+            ),
+            ScheduledMapRelease.objects.filter(
+                Q(release_date__lte=days_ago) &
+                ~(Q(state=PROCESS.NOT_STARTED.value) | Q(state=PROCESS.PENDING.value))
+            ),
+        ]
+
+        # Make sure delete is called for every object so we do not leave out any custom deletes
+        for q in querysets:
+            for o in q:
+                o.delete()
 
         # every six hours should be more than sufficient
         time.sleep(60*60*6)

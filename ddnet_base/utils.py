@@ -1,3 +1,5 @@
+import time
+
 from queue import Queue
 
 class Log:
@@ -20,3 +22,26 @@ class Log:
     def queue(self):
         '''The Queue this object is operating on.'''
         return self._queue
+
+
+def log_exception(logfunc, *exceptions, default=None, retry_seconds=None):
+    '''
+    Catch exceptions and pass them to logfunc.
+
+    Return default on exception or retry in retry_seconds if specified.
+    '''
+
+    def _decorator(func):
+        def _wrapper(*args, **kwargs):
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    logfunc(e)
+                    if retry_seconds is None:
+                        return default
+                    else:
+                        time.sleep(retry_seconds)
+        _wrapper.__doc__ = func.__doc__
+        return _wrapper
+    return _decorator
