@@ -213,7 +213,7 @@ def fix_maps(mapfixes):
 )
 def handle_scheduled_releases():
     while True:
-        sleep_time = 60
+        sleep_time = 300
         try:
             release = ScheduledMapRelease.objects.filter(
                 state=PROCESS.NOT_STARTED.value

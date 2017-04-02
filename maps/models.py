@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.core.exceptions import ValidationError
 import enum
@@ -52,9 +54,6 @@ def validate_mapname(name):
     if name != valid_name:
         raise ValidationError('{} is not a valid Mapname, try {} instead.'.format(name, valid_name))
 
-    if Map.objects.filter(pk=name):
-        raise ValidationError('The Map {} already exists.'.format(name))
-
 
 class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True, validators=[validate_mapname])
@@ -75,6 +74,13 @@ class MapRelease(models.Model):
     class Meta:
         permissions = (('can_release_map', 'Can release maps'),)
         ordering = ('name',)
+
+    def clean(self):
+        super().clean()
+
+        if self.state == PROCESS.NOT_STARTED.value:
+            if Map.objects.filter(pk=self.name):
+                raise ValidationError({'name': 'The Map {} already exists.'.format(self.name)})
 
     def to_Map(self):
         return Map(
@@ -172,6 +178,19 @@ class ScheduledMapRelease(models.Model):
 
     class Meta:
         ordering = ('release_date',)
+
+    def clean(self):
+        super().clean()
+        if self.state == PROCESS.NOT_STARTED.value:
+            # no scheduled release within the next 10 minutes
+            if self.release_date <= timezone.now() + timedelta(seconds=600):
+                raise ValidationError(
+                    {
+                        'release_date':
+                        'A scheduled release needs to be created at least 10 minutes before its '
+                        'releasedate.'
+                    }
+                )
 
     def __str__(self):
         return str(self.release_date)
