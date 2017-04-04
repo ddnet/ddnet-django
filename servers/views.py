@@ -44,7 +44,7 @@ class BroadcastView(PermissionRequiredMixin, TemplateView):
     def target(self, bc):
         '''Run the broadcast process.'''
         global BLOG, BROADCASTING
-        BLOG = Log(queue.Queue())
+        BLOG = Log()
         q = BLOG.queue
 
         try:
