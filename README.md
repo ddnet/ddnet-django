@@ -79,3 +79,5 @@ Please note that the table record_maps in the maps database is assumend to be al
 - @kchaber
 
 ## License
+
+AGPL 3.0, see LICENSE
