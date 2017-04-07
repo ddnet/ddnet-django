@@ -156,6 +156,7 @@ def release_maps(mapreleases, on_finished=None):
         t.daemon = True
         t.start()
     elif on_finished:
+        logger.warning('Maprelease failed (%s)', mapreleases)
         on_finished(PROCESS.FAILED.value)
 
 
@@ -226,10 +227,10 @@ def handle_scheduled_releases():
 
         # time is up...
         if release.release_date < timezone.now():
+            pending = True
+
             # ...and no release pending ?
-            if MapRelease.objects.filter(state=PROCESS.PENDING.value):
-                pending = True
-            else:
+            if not MapRelease.objects.filter(state=PROCESS.PENDING.value):
                 release.state = PROCESS.PENDING.value
                 release.save()
                 pk = release.pk
