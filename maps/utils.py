@@ -20,16 +20,13 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 # Global Logs
-# For Releases:
-RLOG = None
-# For Fixes:
-FLOG = None
+LOGS = {}
 
 def current_release_log():
-    return RLOG
+    return LOGS.get('release')
 
 def current_fix_log():
-    return FLOG
+    return LOGS.get('fix')
 
 
 def print_map(m):
@@ -86,7 +83,6 @@ def print_mapfile(server_type):
 
 
 def release_maps_thread(on_finished=None):
-    global RLOG
     '''Run the release process.'''
     objects = MapRelease.objects.filter(state=PROCESS.PENDING.value)
     objects.update(timestamp=timezone.now())
@@ -99,7 +95,7 @@ def release_maps_thread(on_finished=None):
             m.save()
             maps.append(m)
 
-        q = RLOG.queue
+        q = current_release_log().queue
         p = subprocess.Popen(
             ['map_release'],
             stdin=subprocess.PIPE,
@@ -126,7 +122,7 @@ def release_maps_thread(on_finished=None):
             raise RuntimeError('Subprocess terminated with errors.')
 
         objects.update(state=PROCESS.DONE.value)
-        logobj.log = str(RLOG)
+        logobj.log = str(current_release_log())
         logobj.state = PROCESS.DONE.value
     except Exception as e:
         # revert Mapreleases
@@ -136,21 +132,20 @@ def release_maps_thread(on_finished=None):
             except Exception:
                 pass
         objects.update(state=PROCESS.FAILED.value)
-        logobj.log = str(RLOG) + str(e)
+        logobj.log = str(current_release_log()) + str(e)
         logobj.state = PROCESS.FAILED.value
     finally:
         logobj.save()
-        RLOG = None
+        del LOGS['release']
         if on_finished:
             on_finished(logobj.state)
         logger.info('Maprelease done')
 
 
 def release_maps(mapreleases, on_finished=None):
-    global RLOG
     if mapreleases and not MapRelease.objects.filter(state=PROCESS.PENDING.value):
         logger.info('Starting maprelease')
-        RLOG = Log()
+        LOGS['release'] = Log()
         mapreleases.update(state=PROCESS.PENDING.value)
         t = Thread(target=release_maps_thread, args=(on_finished,))
         t.daemon = True
@@ -161,13 +156,12 @@ def release_maps(mapreleases, on_finished=None):
 
 
 def fix_maps_thread():
-    global FLOG
     '''Run the mapfix process.'''
     objects = MapFix.objects.filter(state=PROCESS.PENDING.value)
     objects.update(timestamp=timezone.now())
     logobj = FixLog()
     try:
-        q = FLOG.queue
+        q = current_fix_log().queue
         p = subprocess.Popen(
             ['map_fix'],
             stdin=subprocess.PIPE,
@@ -184,23 +178,22 @@ def fix_maps_thread():
             raise RuntimeError('Subprocess terminated with errors.')
 
         objects.update(state=PROCESS.DONE.value)
-        logobj.log = str(FLOG)
+        logobj.log = str(current_fix_log())
         logobj.state = PROCESS.DONE.value
     except Exception as e:
         objects.update(state=PROCESS.FAILED.value)
-        logobj.log = str(FLOG) + str(e)
+        logobj.log = str(current_fix_log()) + str(e)
         logobj.state = PROCESS.FAILED.value
     finally:
         logobj.save()
-        FLOG = None
+        del LOGS['fix']
         logger.info('Mapfix done')
 
 
 def fix_maps(mapfixes):
-    global FLOG
     if mapfixes and not MapFix.objects.filter(state=PROCESS.PENDING.value):
         logger.info('Starting mapfix')
-        FLOG = Log()
+        LOGS['fix'] = Log()
         mapfixes.update(state=PROCESS.PENDING.value)
         t = Thread(target=fix_maps_thread)
         t.daemon = True
