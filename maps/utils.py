@@ -124,6 +124,32 @@ def release_maps_thread(on_finished=None):
         objects.update(state=PROCESS.DONE.value)
         logobj.log = str(current_release_log())
         logobj.state = PROCESS.DONE.value
+
+        try:
+            p = subprocess.Popen(
+                ['map_release_done'],
+                stdin=subprocess.PIPE,
+            )
+            p.stdin.write(bytes(json.dumps(
+                {
+                    m.name:
+                        {
+                            'mapper': m.mapper,
+                            'stars': m.stars,
+                            'points': m.points,
+                            'server_type': m.server_type.name
+                        } for m in maps
+                }
+            ), encoding='utf-8'))
+            p.stdin.close()
+            returncode = p.wait()
+            if returncode != 0:
+                logger.info('map_release_done terminated with errors.')
+        except FileNotFoundError:
+            # this is optional, so no error if there is no hook
+            pass
+        except Exception:
+            logger.exception('An Exception occured while executing map_release_done.')
     except Exception as e:
         # revert Mapreleases
         for m in maps:
