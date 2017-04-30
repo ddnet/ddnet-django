@@ -179,6 +179,10 @@ EXTRA_URLS = []
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = ''
 
+# place to temporarily store fix and release logs, to serve them via ajax
+# RELEASE_LOG = 'release.log'
+# FIX_LOG = 'fix.log'
+
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 

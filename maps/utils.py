@@ -1,14 +1,17 @@
+import os
 import json
 import time
 import logging
 import subprocess
-from threading import Thread
+from threading import Thread, Condition
 from datetime import timedelta
 
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Lower
 from django.core.exceptions import ObjectDoesNotExist
+
+from django.conf import settings
 
 from ddnet.utils import Log, log_exception
 
@@ -19,14 +22,21 @@ from .models import (
 
 logger = logging.getLogger(__name__)
 
-# Global Logs
-LOGS = {}
 
 def current_release_log():
-    return LOGS.get('release')
+    try:
+        with open(settings.RELEASE_LOG) as f:
+            return ''.join(f.readlines())
+    except FileNotFoundError:
+        return None
+
 
 def current_fix_log():
-    return LOGS.get('fix')
+    try:
+        with open(settings.FIX_LOG) as f:
+            return ''.join(f.readlines())
+    except FileNotFoundError:
+        return None
 
 
 def print_map(m):
@@ -95,11 +105,10 @@ def release_maps_thread(on_finished=None):
             m.save()
             maps.append(m)
 
-        q = current_release_log().queue
         p = subprocess.Popen(
             ['map_release'],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
+            stdout=open(settings.RELEASE_LOG, 'wb'),
             stderr=subprocess.STDOUT,
         )
         p.stdin.write(bytes(json.dumps(
@@ -114,9 +123,6 @@ def release_maps_thread(on_finished=None):
             }
         ), encoding='utf-8'))
         p.stdin.close()
-        for line in iter(p.stdout.readline, b''):
-            q.put(line.decode('utf-8'))
-        p.stdout.close()
         returncode = p.wait()
         if returncode != 0:
             raise RuntimeError('Subprocess terminated with errors.')
@@ -129,6 +135,7 @@ def release_maps_thread(on_finished=None):
             p = subprocess.Popen(
                 ['map_release_done'],
                 stdin=subprocess.PIPE,
+                stdout=open(settings.RELEASE_LOG, 'wb')
             )
             p.stdin.write(bytes(json.dumps(
                 {
@@ -162,20 +169,23 @@ def release_maps_thread(on_finished=None):
         logobj.state = PROCESS.FAILED.value
     finally:
         logobj.save()
-        del LOGS['release']
         if on_finished:
             on_finished(logobj.state)
+        try:
+            os.remove(settings.RELEASE_LOG)
+        except FileNotFoundError:
+            pass
         logger.info('Maprelease done')
 
 
 def release_maps(mapreleases, on_finished=None):
     if mapreleases and not MapRelease.objects.filter(state=PROCESS.PENDING.value):
         logger.info('Starting maprelease')
-        LOGS['release'] = Log()
         mapreleases.update(state=PROCESS.PENDING.value)
         t = Thread(target=release_maps_thread, args=(on_finished,))
         t.daemon = True
         t.start()
+        return t
     elif on_finished:
         logger.warning('Maprelease failed (%s)', mapreleases)
         on_finished(PROCESS.FAILED.value)
@@ -187,18 +197,14 @@ def fix_maps_thread():
     objects.update(timestamp=timezone.now())
     logobj = FixLog()
     try:
-        q = current_fix_log().queue
         p = subprocess.Popen(
             ['map_fix'],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
+            stdout=open(settings.FIX_LOG, 'wb'),
             stderr=subprocess.STDOUT
         )
         p.stdin.write(bytes('\n'.join(m.mapfile.path for m in objects), encoding='utf-8'))
         p.stdin.close()
-        for line in iter(p.stdout.readline, b''):
-            q.put(line.decode('utf-8'))
-        p.stdout.close()
         returncode = p.wait()
         if returncode != 0:
             raise RuntimeError('Subprocess terminated with errors.')
@@ -212,7 +218,10 @@ def fix_maps_thread():
         logobj.state = PROCESS.FAILED.value
     finally:
         logobj.save()
-        del LOGS['fix']
+        try:
+            os.remove(settings.FIX_LOG)
+        except FileNotFoundError:
+            pass
         logger.info('Mapfix done')
 
 
@@ -231,15 +240,19 @@ def fix_maps(mapfixes):
     Exception,
     retry_seconds=30
 )
-def handle_scheduled_releases():
-    while True:
+def handle_scheduled_releases(condition, run):
+    while run():
         sleep_time = 300
         try:
             release = ScheduledMapRelease.objects.filter(
                 state=PROCESS.NOT_STARTED.value
             ).latest('release_date')
         except ObjectDoesNotExist:
-            time.sleep(sleep_time)
+            # end loop if notified
+            with condition:
+                if not run() or condition.wait(sleep_time):
+                    logger.info('Gracefully shutting down scheduled releases thread.')
+                    break
             continue
 
         pending = False
@@ -268,17 +281,24 @@ def handle_scheduled_releases():
                             except subprocess.TimeoutExpired:
                                 logger.warning('Scheduled Release: Broadcast failed.')
 
-                release_maps(
+                t = release_maps(
                     release.maps.filter(state=PROCESS.NOT_STARTED.value),
                     on_finished=on_finished
                 )
+                # wait for release to finish, no need to contiune looping during releases
+                if t:
+                    t.join()
         # try to be precise
         elif not pending and (release.release_date - timezone.now()).total_seconds() < sleep_time:
             sleep_time = (release.release_date - timezone.now()).total_seconds() + 1
             if sleep_time < 0:
                 sleep_time = 0
 
-        time.sleep(sleep_time)
+        # end loop if notified
+        with condition:
+            if not run() or condition.wait(sleep_time):
+                logger.info('Gracefully shutting down scheduled releases thread.')
+                break
 
 
 @log_exception(
@@ -286,8 +306,8 @@ def handle_scheduled_releases():
     Exception,
     retry_seconds=30
 )
-def handle_cleanup():
-    while True:
+def handle_cleanup(condition, run):
+    while run():
         days = 3
         days_ago = timezone.now() - timedelta(days=days)
 
@@ -321,4 +341,8 @@ def handle_cleanup():
                 o.delete()
 
         # every six hours should be more than sufficient
-        time.sleep(60*60*6)
+        # end loop if notified
+        with condition:
+            if not run() or condition.wait(60*60*6):
+                logger.info('Gracefully shutting down cleanup thread.')
+                break
