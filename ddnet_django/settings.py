@@ -96,10 +96,14 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(name)s::%(funcName)s %(message)s'
+            'style': '{',
+            'format': '{asctime} {levelname} {name}::{funcName} {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'style': '{',
+            'format': '{asctime} {levelname} {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
     },
     'handlers': {
