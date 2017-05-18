@@ -8,8 +8,6 @@ from django.core.management.base import BaseCommand
 
 from maps.utils import handle_cleanup, handle_scheduled_releases
 
-
-logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 

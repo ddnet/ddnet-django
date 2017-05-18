@@ -228,7 +228,6 @@ def fix_maps_thread():
 def fix_maps(mapfixes):
     if mapfixes and not MapFix.objects.filter(state=PROCESS.PENDING.value):
         logger.info('Starting mapfix')
-        LOGS['fix'] = Log()
         mapfixes.update(state=PROCESS.PENDING.value)
         t = Thread(target=fix_maps_thread)
         t.daemon = True
