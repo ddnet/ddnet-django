@@ -2,6 +2,9 @@ import time
 
 from queue import Queue
 
+from django.db.utils import OperationalError
+from django.db import close_old_connections
+
 class Log:
     '''Class to allow non blocking reading from a log being generated.'''
 
@@ -38,6 +41,27 @@ def log_exception(logfunc, *exceptions, default=None, retry_seconds=None):
                     return func(*args, **kwargs)
                 except exceptions as e:
                     logfunc(e)
+                    if retry_seconds is None:
+                        return default
+                    else:
+                        time.sleep(retry_seconds)
+        _wrapper.__doc__ = func.__doc__
+        return _wrapper
+    return _decorator
+
+
+def reconnect_db(logfunc, default=None, retry_seconds=None):
+    '''
+    Catch Operational errors from the database and try to reconnect.
+    '''
+    def _decorator(func):
+        def _wrapper(*args, **kwargs):
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except OperationalError as e:
+                    logfunc(e)
+                    close_old_connections()
                     if retry_seconds is None:
                         return default
                     else:

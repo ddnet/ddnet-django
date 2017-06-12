@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.conf import settings
 
-from ddnet.utils import Log, log_exception
+from ddnet.utils import Log, log_exception, reconnect_db
 
 from .models import (
     Map, MapCategory, MapRelease, ReleaseLog, MapFix, FixLog, ScheduledMapRelease, PROCESS
@@ -237,11 +237,15 @@ def fix_maps(mapfixes):
 @log_exception(
     lambda e: logger.exception('An Exception occured in handle_scheduled_releases'),
     Exception,
-    retry_seconds=30
+    retry_seconds=60
+)
+@reconnect_db(
+    lambda e: logger.exception('Databaseerror in handle_scheduled_releases'),
+    retry_seconds=60
 )
 def handle_scheduled_releases(condition, run):
     while run():
-        sleep_time = 300
+        sleep_time = 300  # check every 5 mins
         try:
             release = ScheduledMapRelease.objects.filter(
                 state=PROCESS.NOT_STARTED.value
@@ -303,8 +307,9 @@ def handle_scheduled_releases(condition, run):
 @log_exception(
     lambda e: logger.exception('An Exception occured in handle_cleanup'),
     Exception,
-    retry_seconds=30
+    retry_seconds=60
 )
+@reconnect_db(lambda e: logger.exception('Databaseerror in handle_cleanup'), retry_seconds=60)
 def handle_cleanup(condition, run):
     while run():
         days = 3
