@@ -23,7 +23,7 @@ class SessionAttributeUtil:
         Method returns the session attribute given by the attr_name
         or sets a default value if attr_name if the session attribute not exists
         '''
-        if not attr_name.value in request.session:
+        if attr_name.value not in request.session:
             request.session[attr_name.value] = default_value
 
         return request.session[attr_name.value]
