@@ -249,7 +249,7 @@ def handle_scheduled_releases(condition, run):
         try:
             release = ScheduledMapRelease.objects.filter(
                 state=PROCESS.NOT_STARTED.value
-            ).latest('release_date')
+            ).earliest('release_date')
         except ObjectDoesNotExist:
             # end loop if notified
             with condition:
