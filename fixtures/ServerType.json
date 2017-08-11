@@ -30,6 +30,15 @@
         "model": "maps.servertype",
         "pk": 4,
         "fields": {
+            "name": "Insane",
+            "offset": 30,
+            "multiplier": 4
+        }
+    },
+    {
+        "model": "maps.servertype",
+        "pk": 5,
+        "fields": {
             "name": "Race",
             "offset": 0,
             "multiplier": 2
@@ -37,7 +46,7 @@
     },
     {
         "model": "maps.servertype",
-        "pk": 5,
+        "pk": 6,
         "fields": {
             "name": "Solo",
             "offset": 0,
@@ -46,7 +55,7 @@
     },
     {
         "model": "maps.servertype",
-        "pk": 6,
+        "pk": 7,
         "fields": {
             "name": "Dummy",
             "offset": 5,
@@ -55,7 +64,7 @@
     },
     {
         "model": "maps.servertype",
-        "pk": 7,
+        "pk": 8,
         "fields": {
             "name": "DDmaX",
             "offset": 0,
@@ -64,7 +73,7 @@
     },
     {
         "model": "maps.servertype",
-        "pk": 8,
+        "pk": 9,
         "fields": {
             "name": "Oldschool",
             "offset": 0,
