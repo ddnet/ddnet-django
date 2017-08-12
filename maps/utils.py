@@ -152,9 +152,11 @@ def release_maps_thread(on_finished=None):
             returncode = p.wait()
             if returncode != 0:
                 logger.info('map_release_done terminated with errors.')
+            else:
+                logger.info('map_release_done terminated successfully.')
         except FileNotFoundError:
             # this is optional, so no error if there is no hook
-            pass
+            logger.info('map_release_done not found in $PATH, not executing.')
         except Exception:
             logger.exception('An Exception occured while executing map_release_done.')
     except Exception as e:
