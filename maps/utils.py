@@ -135,7 +135,8 @@ def release_maps_thread(on_finished=None):
             p = subprocess.Popen(
                 ['map_release_done'],
                 stdin=subprocess.PIPE,
-                stdout=open(settings.RELEASE_LOG, 'wb')
+                stdout=open(settings.RELEASE_LOG, 'wb'),
+                stderr=subprocess.STDOUT,
             )
             p.stdin.write(bytes(json.dumps(
                 {
