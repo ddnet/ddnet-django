@@ -83,14 +83,18 @@ class MapRelease(models.Model):
                 raise ValidationError({'name': 'The Map {} already exists.'.format(self.name)})
 
     def to_Map(self):
-        return Map(
+        m = Map(
             name=self.name,
             server_type=self.server_type,
-            categories=self.categories.all(),
             mapper=self.mapper,
             stars=self.stars,
             timestamp=timezone.now()
         )
+        if self.categories.all():
+            # in order to create a ManyToManyRel both objects have to be saved to the db
+            m.save()
+            m.categories.set(self.categories.all())
+        return m
 
     def __str__(self):
         return self.name
@@ -121,7 +125,7 @@ class Map(models.Model):
 
 
 class MapFix(models.Model):
-    ddmap = models.ForeignKey(Map)
+    ddmap = models.ForeignKey(Map, on_delete=models.CASCADE)
     mapfile = MapFileField(upload_to='mapfixes')
     state = models.IntegerField(
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
