@@ -34,7 +34,7 @@ def release():
             w, h = im.size
             if w / h != 8 / 5 and w >= 8 and h >= 5:
                 w_off = (w - (8 / 5 * h)) / 2 if w > h else 0
-                h_off = (h - (w / (8 / 5))) / 2 if h > w else 0
+                h_off = (h - (w / (8 / 5))) / 2 if h >= w else 0
                 im = im.crop((w_off, h_off, w - w_off, h - h_off))
 
             im.thumbnail((360, 225))
