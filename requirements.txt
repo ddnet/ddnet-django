@@ -1,6 +1,6 @@
 # The requirements file contains all python libraries which must be installed to run the project
 # @see https://pip.pypa.io/en/stable/reference/pip_install/#example-requirements-file for details
-django
+django==1.11
 Pillow
 pytz
 msgpack-python
