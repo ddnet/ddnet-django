@@ -59,7 +59,7 @@ class MapRelease(models.Model):
     name = models.CharField(max_length=128, unique=True, validators=[validate_mapname])
     mapfile = MapFileField(upload_to='mapreleases')
     mapper = models.CharField(max_length=128, blank=True)
-    img = MapImageField(upload_to='mapreleases', validators=[image_validator(1440, 900)])
+    img = MapImageField(upload_to='mapreleases')
 
     server_type = models.ForeignKey(ServerType, on_delete=models.DO_NOTHING)
     categories = models.ManyToManyField(to=MapCategory, blank=True)
