@@ -61,10 +61,6 @@ def print_categories(categories, server_type, maps_set):
 
 
 def print_mapfile(server_type):
-    print('$add_vote "Make sure no one is racing before voting!" "info"')
-    print('$add_vote "Random {} Map" "random_map"'.format(server_type))
-    print('$add_vote "Random {} Map Unfinished by Vote Caller" "random_unfinished_map"'.format(server_type))
-
     if server_type != 'DDmaX':
         print()
         print('─── NEW MAPS ───')
