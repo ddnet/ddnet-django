@@ -28,7 +28,7 @@ django.setup()
 from skins.models import Skin # noqa - need to setup django first
 
 
-soup = bs4.BeautifulSoup(get('https://ddnet.tw/skins/').content, 'html.parser')
+soup = bs4.BeautifulSoup(get('https://ddnet.org/skins/').content, 'html.parser')
 
 skin_table = soup.find(name='table')
 
@@ -53,7 +53,7 @@ for tr in skin_table.find_all('tr'):
         )
 
         skin.skin_image.save(file_name,  # get the actual image and save it
-                             ContentFile(get('https://ddnet.tw/skins/' + download).content))
+                             ContentFile(get('https://ddnet.org/skins/' + download).content))
 
         # write it to db
         skin.save()

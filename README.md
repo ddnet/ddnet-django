@@ -1,6 +1,6 @@
 # DDNet Django
 
-[![DDraceNetwork](https://ddnet.tw/ddnet-small.png)](https://ddnet.tw)
+[![DDraceNetwork](https://ddnet.org/ddnet-small.png)](https://ddnet.org)
 [![django](http://www.dreamincode.net/forums/uploads/monthly_10_2014/post-659421-141328499356.png)](https://www.djangoproject.com/)
 
 ## Installation
