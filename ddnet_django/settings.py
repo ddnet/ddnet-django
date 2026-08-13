@@ -166,6 +166,11 @@ FIXTURE_DIRS = ['fixtures']
 
 DEFAULT_FILE_STORAGE = 'ddnet_django.storage.DDNetFileSystemStorage'
 
+# Directory containing the currently released mapfiles, searched recursively.
+# Used to diff uploaded mapfixes against the released version; diffing is
+# skipped if unset or the directory does not exist.
+MAPS_DIR = None
+
 EXTRA_URLS = []
 
 # Create a file settings_private.py and put the following configuration-options there so they are

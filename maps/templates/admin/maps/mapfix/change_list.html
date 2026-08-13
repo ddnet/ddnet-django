@@ -1,0 +1,8 @@
+{% extends "admin/change_list.html" %}
+
+{# the default add button is replaced: mapfixes are only created through the upload pipeline #}
+{% block object-tools-items %}
+    <li>
+        <a href="{% url 'admin:map_fix_upload' %}" class="addlink">Upload fixes</a>
+    </li>
+{% endblock %}

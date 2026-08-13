@@ -16,7 +16,6 @@
     {% if object_id != None %}
         <a class="button big" href="{% url 'admin:map_fix' %}?ids={{ object_id }}">Fix...</a>
     {% endif %}
-    <input type="submit" value="Save and add another" name="_addanother" />
     <input type="submit" value="Save and continue editing" name="_continue" />
 </div>
 {% endblock %}

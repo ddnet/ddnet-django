@@ -193,6 +193,7 @@ def release_maps(mapreleases, on_finished=None):
 def fix_maps_thread():
     '''Run the mapfix process.'''
     objects = MapFix.objects.filter(state=PROCESS.PENDING.value)
+    pks = list(objects.values_list('pk', flat=True))
     objects.update(timestamp=timezone.now())
     logobj = FixLog()
     try:
@@ -217,11 +218,17 @@ def fix_maps_thread():
         logobj.state = PROCESS.FAILED.value
     finally:
         logobj.save()
+        MapFix.objects.filter(pk__in=pks).update(log=logobj)
         try:
             os.remove(settings.FIX_LOG)
         except FileNotFoundError:
             pass
         logger.info('Mapfix done')
+        # start fixes that queued up while this run was going
+        queued = MapFix.objects.filter(state=PROCESS.NOT_STARTED.value)
+        if queued:
+            logger.info('Starting queued mapfixes')
+            fix_maps(queued)
 
 
 def fix_maps(mapfixes):

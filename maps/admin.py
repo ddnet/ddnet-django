@@ -9,7 +9,10 @@ from .models import (
     MapRelease, ServerType, Map, MapCategory, MapFix, ReleaseLog, FixLog, ScheduledMapRelease,
     PROCESS
 )
-from .views import MapReleaseView, MapFixView
+from .views import (
+    MapReleaseView, MapFixView, MapFixUploadView, MapFixMapSearchView, MapFixDiffView,
+    MapFixStatusView
+)
 
 
 class MapAdmin(ModelAdmin):
@@ -96,9 +99,25 @@ class MapFixAdmin(ModelAdmin):
 
         return super().get_readonly_fields(request, obj) + ('state',)
 
+    def add_view(self, request, form_url='', extra_context=None):
+        # mapfixes are only created through the upload pipeline
+        return HttpResponseRedirect(reverse('admin:map_fix_upload'))
+
+    def changelist_view(self, request, extra_context=None):
+        # the upload pipeline is the primary entry point; the plain list of
+        # existing fixes stays reachable via any querystring (e.g. "?q=", used
+        # by the link on the upload page)
+        if not request.GET:
+            return HttpResponseRedirect(reverse('admin:map_fix_upload'))
+        return super().changelist_view(request, extra_context)
+
     def get_urls(self):
         return super().get_urls() + [
             url(r'^fix', MapFixView.as_view(), name='map_fix'),
+            url(r'^upload', MapFixUploadView.as_view(), name='map_fix_upload'),
+            url(r'^mapsearch', MapFixMapSearchView.as_view(), name='map_fix_search'),
+            url(r'^mapdiff', MapFixDiffView.as_view(), name='map_fix_diff'),
+            url(r'^status', MapFixStatusView.as_view(), name='map_fix_status'),
         ]
 
 

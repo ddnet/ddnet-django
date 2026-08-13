@@ -35,10 +35,16 @@ class DefaultRouter:
     def allow_relation(self, obj1, obj2, **hints):
         '''
         Return whether a relation between two objects is allowed.
+
+        Only has an opinion if at least one of the objects belongs to an app
+        with its own database; everything else (e.g. django-internal relations
+        like Permission <-> ContentType) is left to the default behaviour.
         '''
-        if obj1._meta.app_label == obj2._meta.app_label:
-            return True
-        return False
+        db1 = APP_DATABASES.get(obj1._meta.app_label)
+        db2 = APP_DATABASES.get(obj2._meta.app_label)
+        if db1 or db2:
+            return db1 == db2
+        return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         '''

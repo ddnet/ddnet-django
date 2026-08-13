@@ -5,3 +5,6 @@ Pillow
 pytz
 msgpack-python
 pypng>=0.0.12
+# for diffing mapfixes against released maps (maps/mapdiff.py)
+numpy
+twmap

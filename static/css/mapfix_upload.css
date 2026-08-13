@@ -1,0 +1,329 @@
+.mapfix-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 4px;
+}
+
+.mapfix-grid.dragover {
+    outline: 2px dashed #79aec8;
+    outline-offset: 4px;
+}
+
+.mapfix-card {
+    width: 260px;
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    background: #fff;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.mapfix-card .cardhead {
+    flex: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.mapfix-card .filename {
+    flex: 1 1 auto;
+    font-weight: bold;
+    word-break: break-all;
+    max-height: 2.6em;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.mapfix-card .filename:hover {
+    color: #447e9b;
+    text-decoration: underline;
+}
+
+.mapfix-card .remove {
+    flex: none;
+    border: none;
+    background: none;
+    color: #ba2121;
+    font-size: 22px;
+    line-height: 22px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.mapfix-card .remove:hover {
+    color: #f00;
+}
+
+.mapfix-card .fixbtn {
+    flex: none;
+    border: none;
+    border-radius: 4px;
+    background: #4a9e4a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 22px;
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.mapfix-card .fixbtn:hover {
+    background: #3d8b3d;
+}
+
+.mapfix-card .fixbtn.armed {
+    background: #d0a84c;
+}
+
+.mapfix-card .fixbtn:disabled {
+    background: #aaa;
+    cursor: default;
+}
+
+.mapfix-card.done {
+    border-color: #6a9955;
+    background: #f4faf4;
+}
+
+.mapfix-card.done .status {
+    color: #2e7d32;
+}
+
+.mapfix-card.done .filename {
+    cursor: default;
+}
+
+.mapfix-card.done .filename:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mapfix-card .maprow {
+    flex: none;
+    margin-top: 8px;
+    position: relative;
+}
+
+.mapfix-card input.map-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mapfix-card .status {
+    flex: none;
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    min-height: 13px;
+    color: #666;
+}
+
+.mapfix-card.ok {
+    border-color: #6a9955;
+}
+
+.mapfix-card.ok .status {
+    color: #2e7d32;
+}
+
+.mapfix-card.weak {
+    border-color: #d0a84c;
+    background: #fffbe9;
+}
+
+.mapfix-card.weak .status {
+    color: #9c6f00;
+}
+
+.mapfix-card.bad {
+    border-color: #ba2121;
+    background: #fff4f4;
+}
+
+.mapfix-card.bad .status {
+    color: #ba2121;
+}
+
+.mapfix-card .diff {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #eee;
+    font-size: 11px;
+    color: #555;
+}
+
+.mapfix-card .diff ul {
+    margin: 0;
+    padding: 0 0 0 14px;
+}
+
+.mapfix-card .diff li {
+    list-style: square;
+    margin: 0;
+    padding: 0;
+}
+
+.mapfix-card .suggestions {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    max-height: 160px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mapfix-card .suggestions li {
+    padding: 4px 6px;
+    cursor: pointer;
+}
+
+.mapfix-card .suggestions li:hover {
+    background: #79aec8;
+    color: #fff;
+}
+
+.mapfix-add {
+    width: 260px;
+    height: 260px;
+    border: 2px dashed #79aec8;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: #79aec8;
+    cursor: pointer;
+    background: none;
+    box-sizing: border-box;
+}
+
+.mapfix-add:hover {
+    background: #f0f6f9;
+}
+
+.mapfix-table {
+    margin: 8px 0;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.mapfix-table th,
+.mapfix-table td {
+    padding: 6px 12px 6px 0;
+    text-align: left;
+    word-break: break-word;
+}
+
+.mapfix-table th:nth-child(1) {
+    width: 24px;
+}
+
+.mapfix-table th:nth-child(3) {
+    width: 200px;
+}
+
+.mapfix-table th:nth-child(4) {
+    width: 220px;
+}
+
+.mapfix-table .fixrow.haslog {
+    cursor: pointer;
+}
+
+.mapfix-table .fixrow.haslog:hover td {
+    background: #f5f9fb;
+}
+
+#mapfix-start-queued {
+    border: none;
+    border-radius: 4px;
+    background: #4a9e4a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+#mapfix-start-queued:hover {
+    background: #3d8b3d;
+}
+
+#mapfix-start-queued:disabled {
+    background: #aaa;
+    cursor: default;
+}
+
+.mapfix-table .toggle {
+    width: 18px;
+    cursor: pointer;
+    color: #447e9b;
+    user-select: none;
+}
+
+.mapfix-table .fixrow.state-failed td {
+    color: #ba2121;
+}
+
+.mapfix-table .fixrow.state-running td {
+    font-weight: bold;
+}
+
+.mapfix-table .logrow .loglabel {
+    margin: 6px 0 2px 18px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.mapfix-table .logrow pre.fixlog {
+    margin: 4px 0 8px 18px;
+    padding: 8px;
+    max-height: 300px;
+    overflow: auto;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    font-size: 11px;
+}
+
+/* indeterminate: the external fix tool reports no percentages */
+.mapfix-progress {
+    display: inline-block;
+    width: 90px;
+    height: 8px;
+    margin-left: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #e4e4e4;
+    vertical-align: middle;
+}
+
+.mapfix-progress span {
+    display: block;
+    width: 40%;
+    height: 100%;
+    border-radius: 4px;
+    background: #4a9e4a;
+    animation: mapfix-slide 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes mapfix-slide {
+    from { margin-left: 0; }
+    to { margin-left: 60%; }
+}

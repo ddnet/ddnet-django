@@ -4,7 +4,7 @@ from django.conf.urls import url
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
-from maps.views import MapReleaseView, MapFixView
+from maps.views import MapReleaseView, MapFixView, MapFixUploadView
 from servers.views import BroadcastView
 
 
@@ -15,6 +15,7 @@ class DDNetAdmin(admin.AdminSite):
 site = DDNetAdmin()
 MapReleaseView.admin = site
 MapFixView.admin = site
+MapFixUploadView.admin = site
 BroadcastView.admin = site
 
 site.register(Group, GroupAdmin)

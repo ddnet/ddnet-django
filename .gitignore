@@ -6,3 +6,7 @@ db.sqlite3
 .DS_Store
 media
 .idea
+
+# local dev environment
+.venv
+dev/

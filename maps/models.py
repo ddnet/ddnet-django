@@ -131,10 +131,17 @@ class MapFix(models.Model):
         default=0, choices=((v.value, n) for n, v in PROCESS.__members__.items())
     )
     timestamp = models.DateTimeField(blank=True, auto_now_add=True)
+    # the log of the fix run that processed this mapfix
+    log = models.ForeignKey(
+        'FixLog', null=True, blank=True, on_delete=models.SET_NULL, related_name='fixes'
+    )
+    # diff summary against the released mapfile, captured at upload time
+    changelog = models.TextField(default='', blank=True)
 
     class Meta:
         ordering = ('mapfile',)
         permissions = (('can_fix_map', 'Can fix maps'),)
+        verbose_name_plural = 'map fixes'
 
     @property
     def name(self):

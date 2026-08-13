@@ -1,0 +1,88 @@
+{% extends "admin/base_site.html" %}
+
+{% load staticfiles i18n admin_urls %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static "css/mapfix_upload.css" %}"/>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}?q=">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; upload
+</div>
+{% endblock %}
+
+{% block content %}
+
+<h1>Upload map fixes</h1>
+{% if errors %}
+<ul class="errorlist">
+    {% for error in errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<ul class="errorlist" id="mapfix-errors" style="display: none"></ul>
+
+<input type="hidden" name="csrfmiddlewaretoken" id="mapfix-csrf" value="{{ csrf_token }}" />
+<div class="mapfix-grid" id="mapfix-grid">
+    <button type="button" class="mapfix-add" id="mapfix-add" title="Add mapfiles">+</button>
+</div>
+<input type="file" id="mapfix-file-input" accept=".map" multiple style="display: none" />
+<input type="file" id="mapfix-replace-input" accept=".map" style="display: none" />
+
+<div id="mapfix-fixes" {% if not pipeline.rows %}style="display: none"{% endif %}>
+    <h2>Fixes</h2>
+    <table class="mapfix-table" id="mapfix-table">
+        <thead><tr><th></th><th>Map</th><th>Status</th><th>When</th></tr></thead>
+        <tbody id="mapfix-table-body">
+            {% for r in pipeline.rows %}
+                <tr class="fixrow state-{{ r.state }}">
+                    <td class="toggle"></td>
+                    <td>{{ r.name }}</td>
+                    <td>{{ r.status }}</td>
+                    <td>{{ r.when }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        <button type="button" id="mapfix-start-queued" data-ids="{{ pipeline.queued_ids }}"
+                {% if not pipeline.queued_ids %}style="display: none"{% endif %}
+                {% if pipeline.running %}disabled title="Another fix is currently running."{% endif %}>
+            Start queued fixes
+        </button>
+    </p>
+</div>
+
+<noscript>
+    <p>
+        Javascript is disabled &mdash; select mapfiles below instead; each
+        filename is matched to the closest existing mapname on the server.
+    </p>
+    <form enctype="multipart/form-data" action="" method="post" novalidate>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+        <input type="hidden" name="start" value="on" />
+        <fieldset class="module aligned">
+            <div class="form-row">
+                <label for="id_mapfiles">Mapfiles:</label>
+                <input type="file" name="mapfiles" id="id_mapfiles" accept=".map" multiple required />
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Upload" class="default" name="_upload" />
+        </div>
+    </form>
+</noscript>
+
+<script type="text/javascript">
+    var MAPFIX_SEARCH_URL = "{% url 'admin:map_fix_search' %}";
+    var MAPFIX_DIFF_URL = "{% url 'admin:map_fix_diff' %}";
+    var MAPFIX_START_URL = "{% url 'admin:map_fix' %}";
+    var MAPFIX_STATUS_URL = "{% url 'admin:map_fix_status' %}";
+</script>
+<script type="text/javascript" src="{% static "scripts/mapfix_upload.js" %}"></script>
+{% endblock %}
