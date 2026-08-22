@@ -1,5 +1,5 @@
 asgiref==3.10.0
-Django==5.1.13
+Django==5.2.16
 mysqlclient==2.2.7; platform_system != "Windows"
 pillow==12.0.0
 psycopg2-binary==2.9.12; platform_system != "Windows"
