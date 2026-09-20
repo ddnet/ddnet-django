@@ -4,5 +4,5 @@ mysqlclient==2.2.7; platform_system != "Windows"
 pillow==12.0.0
 psycopg2-binary==2.9.12; platform_system != "Windows"
 PyMySQL==1.1.2; platform_system == "Windows"
-sqlparse==0.5.3
+sqlparse==0.6.0
 tzdata==2025.2; platform_system == "Windows"
